@@ -1,0 +1,818 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Luna Ciclo</title>
+<meta name="theme-color" content="#15122b">
+<meta name="robots" content="noindex,nofollow">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Luna">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="icon-180.png">
+<link rel="stylesheet" href="fonts.css">
+<style>:root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0}[hidden]{display:none!important}img{max-width:100%}</style>
+</head>
+<body>
+<style>
+/* Layout: una sola columna de app (máx. 520px) con barra de pestañas fija abajo; tarjetas solo donde agrupan un dato */
+:root{
+  --bg:#15122b; --surface:#1e1a3b; --surface2:#2a2452; --line:#342d63;
+  --fg:#ece7ff; --muted:#a59dd0; --faint:#6f68a0;
+  --period:#f08cb8; --period-ink:#2a0f22; --period-soft:rgba(240,140,184,.18);
+  --fertile:#8f7cf0; --fertile-soft:rgba(143,124,240,.34); --ovu:#c9bbff;
+  --pms:#f5c26b; --pms-soft:rgba(245,194,107,.16); --ok:#7fd4b0;
+  --shadow:0 18px 40px -24px rgba(0,0,0,.7);
+  --f-display:"Fraunces",Georgia,"Times New Roman",serif;
+  --f-ui:"Figtree",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+  color-scheme:dark;
+}
+@media (prefers-color-scheme: light){:root:not([data-theme="dark"]){
+  --bg:#f4f2fb; --surface:#ffffff; --surface2:#ebe7fa; --line:#dcd6f1;
+  --fg:#1f1a3d; --muted:#625b8c; --faint:#9790bd;
+  --period:#d6457d; --period-ink:#ffffff; --period-soft:rgba(214,69,125,.13);
+  --fertile:#6a55e0; --fertile-soft:rgba(106,85,224,.14); --ovu:#3f2fb0;
+  --pms:#b7791f; --pms-soft:rgba(183,121,31,.12); --ok:#1f8a63;
+  --shadow:0 14px 32px -22px rgba(40,30,90,.35); color-scheme:light}}
+:root[data-theme="light"]{
+  --bg:#f4f2fb; --surface:#ffffff; --surface2:#ebe7fa; --line:#dcd6f1;
+  --fg:#1f1a3d; --muted:#625b8c; --faint:#9790bd;
+  --period:#d6457d; --period-ink:#ffffff; --period-soft:rgba(214,69,125,.13);
+  --fertile:#6a55e0; --fertile-soft:rgba(106,85,224,.14); --ovu:#3f2fb0;
+  --pms:#b7791f; --pms-soft:rgba(183,121,31,.12); --ok:#1f8a63;
+  --shadow:0 14px 32px -22px rgba(40,30,90,.35); color-scheme:light}
+
+*{box-sizing:border-box}
+html,body{background:var(--bg)}
+body{color:var(--fg);font-family:var(--f-ui);font-size:15px;line-height:1.5;-webkit-tap-highlight-color:transparent;font-variant-numeric:tabular-nums}
+button,input,textarea,select{font:inherit;color:inherit}
+button{cursor:pointer}
+:focus-visible{outline:2px solid var(--fertile);outline-offset:2px;border-radius:6px}
+.app{max-width:520px;margin:0 auto;padding-block:14px 110px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));display:grid;gap:18px}
+h1,h2,h3{margin:0;text-wrap:balance}
+.eyebrow{font-size:.72rem;letter-spacing:.09em;text-transform:uppercase;color:var(--muted);font-weight:600}
+.muted{color:var(--muted)}
+.topbar{display:flex;justify-content:space-between;align-items:center;gap:12px}
+.brand{display:flex;align-items:center;gap:8px;font-family:var(--f-display);font-size:1.15rem}
+.brand svg{width:22px;height:22px}
+.datechip{font-size:.85rem;color:var(--muted)}
+.banner{background:var(--surface2);border:1px solid var(--line);border-radius:14px;padding:10px 12px;font-size:.85rem;display:flex;gap:10px;align-items:center;justify-content:space-between;flex-wrap:wrap}
+.banner button{background:none;border:0;color:var(--period);font-weight:600;padding:4px 0}
+.view{display:grid;gap:18px}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:20px;padding:16px;display:grid;gap:8px;box-shadow:var(--shadow);min-width:0}
+.card h2{font-family:var(--f-display);font-weight:500;font-size:1.25rem}
+.row2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.kv small{display:block;font-size:.75rem;color:var(--muted)}
+.kv strong{display:block;font-family:var(--f-display);font-weight:500;font-size:1.35rem;line-height:1.2}
+.kv span{display:block;font-size:.8rem;color:var(--muted)}
+
+/* Hoy */
+.hello{font-family:var(--f-display);font-size:1.55rem;font-weight:400;line-height:1.2}
+.ringwrap{position:relative;width:min(260px,72vw);aspect-ratio:1;max-width:100%;margin:4px auto 0}
+.ringwrap svg{width:100%;height:100%;display:block}
+.ring-in{position:absolute;inset:0;display:grid;place-content:center;text-align:center;gap:2px}
+.ring-in b{font-family:var(--f-display);font-weight:400;font-size:4.2rem;line-height:1}
+.ring-in span{font-size:.85rem;color:var(--muted)}
+.pill{justify-self:center;display:inline-flex;align-items:center;gap:8px;border-radius:999px;padding:6px 14px;font-size:.88rem;font-weight:600;background:var(--surface2);border:1px solid var(--line)}
+.pill i{width:9px;height:9px;border-radius:50%;background:var(--k,var(--fertile))}
+.next strong.big{font-family:var(--f-display);font-weight:500;font-size:1.6rem;line-height:1.15}
+.late{color:var(--pms);font-weight:600}
+.phase-text{font-size:.92rem;color:var(--muted);margin:0}
+.actions{display:grid;gap:10px}
+.btn{border:0;border-radius:16px;padding:15px 16px;font-weight:700;font-size:1rem;background:var(--period);color:var(--period-ink);box-shadow:0 10px 24px -14px var(--period)}
+.btn.ghost{background:transparent;color:var(--fg);border:1px solid var(--line);box-shadow:none;font-weight:600}
+.btn.small{padding:10px 14px;font-size:.9rem;border-radius:12px}
+.btn.violet{background:var(--fertile);color:#fff;box-shadow:0 10px 24px -14px var(--fertile)}
+.btn.danger{background:transparent;color:var(--period);border:1px solid var(--period);box-shadow:none}
+.linkbtn{background:none;border:0;color:var(--muted);text-decoration:underline;text-underline-offset:3px;padding:6px;font-size:.88rem;justify-self:center}
+.legend{display:flex;flex-wrap:wrap;gap:6px 14px;font-size:.78rem;color:var(--muted)}
+.legend em{font-style:normal;display:inline-flex;align-items:center;gap:6px}
+.legend em::before{content:"";width:10px;height:10px;border-radius:3px;background:var(--k);border:var(--b,0)}
+
+/* Calendario */
+.calhead{display:flex;justify-content:space-between;align-items:center}
+.calhead h2{font-family:var(--f-display);font-weight:500;font-size:1.35rem;text-transform:capitalize}
+.iconbtn{width:42px;height:42px;border-radius:12px;border:1px solid var(--line);background:var(--surface);display:grid;place-items:center}
+.iconbtn svg{width:18px;height:18px}
+.grid{display:grid;grid-template-columns:repeat(7,1fr);gap:4px;text-align:center}
+.grid .dow{font-size:.72rem;color:var(--muted);padding:4px 0;text-transform:uppercase;letter-spacing:.05em}
+.day{position:relative;aspect-ratio:1;border:0;background:transparent;border-radius:12px;display:grid;place-items:center;font-size:.95rem;padding:0;min-width:0}
+.day.out{visibility:hidden}
+.day.past{color:var(--fg)}
+.day.fert{background:var(--fertile-soft)}
+.day.pms{background:var(--pms-soft)}
+.day.ovu::after{content:"";position:absolute;inset:5px;border-radius:50%;border:2px solid var(--fertile)}
+.day.pred{box-shadow:inset 0 0 0 2px var(--period);background:var(--period-soft)}
+.day.per{background:var(--period);color:var(--period-ink);font-weight:700}
+.day.today{font-weight:800;box-shadow:inset 0 0 0 2px var(--fg)}
+.day.today::before{content:"";position:absolute;bottom:5px;width:5px;height:5px;border-radius:50%;background:currentColor}
+.day.sel{background:var(--fg);color:var(--bg);font-weight:700}
+.day.selr{background:color-mix(in srgb,var(--fg) 25%,transparent)}
+.day.note-dot .nd{position:absolute;top:5px;right:6px;width:5px;height:5px;border-radius:50%;background:var(--ovu)}
+.hint{font-size:.88rem;color:var(--muted);text-align:center;margin:0}
+.addbar{display:flex;gap:10px}
+.addbar .btn{flex:1}
+
+/* Estadísticas */
+.chart-scroll{overflow-x:auto;scrollbar-width:thin;-webkit-overflow-scrolling:touch;padding-bottom:4px}
+.chart{display:flex;align-items:flex-end;gap:14px;min-height:210px;padding-top:6px}
+.cbar{display:grid;justify-items:center;gap:6px;min-width:36px}
+.cbar .nums{font-size:.78rem;text-align:center;line-height:1.25}
+.cbar .nums b{display:block;font-size:.95rem}
+.cbar .nums span{color:var(--period)}
+.cbar .pair{display:flex;align-items:flex-end;gap:4px;height:140px}
+.cbar .c{width:11px;border-radius:6px 6px 3px 3px;background:linear-gradient(to top,color-mix(in srgb,var(--fertile) 35%,transparent),var(--fertile))}
+.cbar .p{width:11px;border-radius:6px 6px 3px 3px;background:linear-gradient(to top,color-mix(in srgb,var(--period) 35%,transparent),var(--period))}
+.cbar small{font-size:.72rem;color:var(--muted);text-align:center;line-height:1.2}
+.cbar.cur .c{background:repeating-linear-gradient(45deg,var(--fertile) 0 4px,transparent 4px 8px)}
+.regular{display:flex;gap:10px;align-items:flex-start;font-size:.92rem}
+.regular i{flex:none;width:10px;height:10px;border-radius:50%;margin-top:6px;background:var(--k)}
+.months{display:grid;grid-template-columns:repeat(12,1fr);gap:4px;align-items:end;height:120px}
+.months .m{display:grid;justify-items:center;gap:3px;height:100%;align-content:end}
+.months .m i{width:100%;max-width:18px;border-radius:4px 4px 2px 2px;background:var(--fertile);display:block}
+.months .m i.none{background:var(--line);height:3px}
+.months .m b{font-size:.68rem;font-weight:600}
+.months .m small{font-size:.66rem;color:var(--muted)}
+.moodbars{display:grid;gap:8px}
+.moodbar{display:grid;grid-template-columns:90px 1fr 28px;gap:10px;align-items:center;font-size:.88rem}
+.moodbar .track{height:10px;border-radius:5px;background:var(--surface2);overflow:hidden}
+.moodbar .track i{display:block;height:100%;background:var(--ovu);border-radius:5px}
+.moodbar b{text-align:right}
+
+/* Datos */
+.hist{display:grid;gap:0;margin:0;padding:0;list-style:none}
+.hist li{border-top:1px solid var(--line)}
+.hist li:first-child{border-top:0}
+.hist button{width:100%;background:none;border:0;text-align:left;padding:12px 2px;display:grid;grid-template-columns:1fr auto;gap:2px 12px}
+.hist .d{font-weight:600}
+.hist .s{font-size:.82rem;color:var(--muted);grid-column:1/-1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.hist .len{font-size:.82rem;color:var(--muted);text-align:right}
+.tags{display:flex;flex-wrap:wrap;gap:4px}
+.tagmini{font-size:.7rem;padding:1px 8px;border-radius:999px;background:var(--surface2);color:var(--muted)}
+textarea,input[type=date],input[type=text]{width:100%;background:var(--surface2);border:1px solid var(--line);border-radius:12px;padding:11px 12px;min-width:0}
+textarea{resize:vertical;min-height:84px}
+textarea.code{font-family:ui-monospace,"SF Mono",Menlo,Consolas,monospace;font-size:.82rem;min-height:120px}
+.seg{display:inline-flex;background:var(--surface2);border-radius:12px;padding:3px;gap:3px}
+.seg button{border:0;background:transparent;border-radius:9px;padding:8px 14px;font-weight:600;color:var(--muted)}
+.seg button[aria-pressed="true"]{background:var(--surface);color:var(--fg);box-shadow:0 2px 6px -3px rgba(0,0,0,.4)}
+.msg{font-size:.88rem;border-radius:12px;padding:10px 12px;background:var(--surface2)}
+.msg.err{color:var(--period)}
+.msg.ok{color:var(--ok)}
+.btnrow{display:flex;gap:10px;flex-wrap:wrap}
+.small-print{font-size:.8rem;color:var(--muted)}
+details summary{cursor:pointer;font-weight:600}
+pre.fmt{background:var(--surface2);border-radius:12px;padding:10px 12px;overflow-x:auto;font-size:.8rem;margin:6px 0 0}
+
+/* Pestañas */
+.tabs{position:fixed;left:0;right:0;bottom:0;z-index:20;background:color-mix(in srgb,var(--bg) 88%,transparent);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);border-top:1px solid var(--line);padding-bottom:env(safe-area-inset-bottom,0px);padding-left:env(safe-area-inset-left,0px);padding-right:env(safe-area-inset-right,0px)}
+.tabs nav{max-width:520px;margin:0 auto;display:grid;grid-template-columns:repeat(4,1fr)}
+.tabs button{background:none;border:0;padding:10px 4px 12px;display:grid;justify-items:center;gap:3px;font-size:.72rem;font-weight:600;color:var(--faint)}
+.tabs button svg{width:22px;height:22px}
+.tabs button[aria-current="page"]{color:var(--fg)}
+.tabs button[aria-current="page"] svg{color:var(--period)}
+
+/* Hoja inferior */
+.scrim{position:fixed;inset:0;background:rgba(8,6,20,.55);z-index:40;opacity:0;transition:opacity .2s}
+.scrim.show{opacity:1}
+.sheet{position:fixed;left:0;right:0;bottom:0;z-index:41;max-height:88vh;overflow-y:auto;background:var(--surface);border-radius:24px 24px 0 0;border-top:1px solid var(--line);transform:translateY(100%);transition:transform .25s ease}
+.sheet.show{transform:none}
+.sheet .in{max-width:520px;margin:0 auto;padding-block:10px calc(20px + env(safe-area-inset-bottom,0px));padding-left:max(18px,env(safe-area-inset-left,0px));padding-right:max(18px,env(safe-area-inset-right,0px));display:grid;gap:14px}
+.grab{width:40px;height:5px;border-radius:3px;background:var(--line);justify-self:center}
+.sheet h3{font-family:var(--f-display);font-weight:500;font-size:1.3rem}
+.field{display:grid;gap:6px}
+.field label,.field .lbl{font-size:.82rem;color:var(--muted);font-weight:600}
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.chip{border:1px solid var(--line);background:var(--surface2);border-radius:999px;padding:7px 13px;font-size:.88rem;font-weight:500}
+.chip[aria-pressed="true"]{background:var(--fertile);border-color:var(--fertile);color:#fff}
+.check{display:flex;gap:8px;align-items:center;font-size:.9rem}
+
+.toast{position:fixed;left:50%;bottom:calc(84px + env(safe-area-inset-bottom,0px));transform:translate(-50%,20px);opacity:0;z-index:50;background:var(--fg);color:var(--bg);border-radius:14px;padding:11px 14px;font-size:.9rem;display:flex;gap:14px;align-items:center;transition:all .2s;max-width:calc(100% - 32px);pointer-events:none}
+.toast.show{opacity:1;transform:translate(-50%,0);pointer-events:auto}
+.toast button{background:none;border:0;color:inherit;font-weight:700;text-decoration:underline;padding:0}
+
+.empty{text-align:center;display:grid;gap:12px;justify-items:center;padding:24px 8px}
+.empty .moon{width:96px;height:96px}
+@media (prefers-reduced-motion: reduce){*{transition:none!important;animation:none!important}}
+</style>
+
+<div class="app" id="app">
+  <div class="topbar">
+    <div class="brand"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15.5 3.2A9 9 0 1 0 20.8 15 7.2 7.2 0 0 1 15.5 3.2Z" fill="var(--period)"/></svg>Luna</div>
+    <div class="datechip" id="todayLabel"></div>
+  </div>
+  <div id="demoBanner" class="banner" hidden>
+    <span>Estás viendo datos de ejemplo.</span>
+    <button type="button" id="startOwn">Empezar con mis datos</button>
+  </div>
+  <main id="view" class="view" aria-live="polite"></main>
+</div>
+
+<div class="tabs"><nav aria-label="Secciones">
+  <button type="button" data-tab="hoy" id="tab-hoy"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><path d="M12 3.5a8.5 8.5 0 0 1 0 17" fill="currentColor" stroke="none" opacity=".35"/></svg>Hoy</button>
+  <button type="button" data-tab="cal" id="tab-cal"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><rect x="3.5" y="5" width="17" height="15.5" rx="3"/><path d="M3.5 10h17M8 3v4M16 3v4"/></svg>Calendario</button>
+  <button type="button" data-tab="stats" id="tab-stats"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><path d="M6 20V11M11 20V5M16 20v-7M21 20H3"/></svg>Estadísticas</button>
+  <button type="button" data-tab="datos" id="tab-datos"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><ellipse cx="12" cy="6" rx="7.5" ry="2.8"/><path d="M4.5 6v6c0 1.5 3.4 2.8 7.5 2.8s7.5-1.3 7.5-2.8V6M4.5 12v6c0 1.5 3.4 2.8 7.5 2.8s7.5-1.3 7.5-2.8v-6"/></svg>Datos</button>
+</nav></div>
+
+<div class="scrim" id="scrim" hidden></div>
+<div class="sheet" id="sheet" role="dialog" aria-modal="true" aria-labelledby="sheetTitle" hidden><div class="in" id="sheetIn"></div></div>
+<div class="toast" id="toast" role="status"><span id="toastMsg"></span><button type="button" id="toastAct" hidden></button></div>
+
+<script>
+(function(){
+"use strict";
+/* ---------- Utilidades de fecha (días enteros UTC, sin problemas de horario de verano) ---------- */
+const DAY=86400000;
+const MES=["ene","feb","mar","abr","may","jun","jul","ago","sep","oct","nov","dic"];
+const MESL=["enero","febrero","marzo","abril","mayo","junio","julio","agosto","septiembre","octubre","noviembre","diciembre"];
+const DOW=["domingo","lunes","martes","miércoles","jueves","viernes","sábado"];
+const toN=s=>{const [y,m,d]=s.split("-").map(Number);return Math.round(Date.UTC(y,m-1,d)/DAY)};
+const toS=n=>new Date(n*DAY).toISOString().slice(0,10);
+const D=n=>new Date(n*DAY);
+const todayN=()=>{const t=new Date();return Math.round(Date.UTC(t.getFullYear(),t.getMonth(),t.getDate())/DAY)};
+const fmt=n=>{const d=D(n);return d.getUTCDate()+" "+MES[d.getUTCMonth()]};
+const fmtY=n=>{const d=D(n);return d.getUTCDate()+" "+MES[d.getUTCMonth()]+" "+d.getUTCFullYear()};
+const fmtLong=n=>{const d=D(n);return d.getUTCDate()+" de "+MESL[d.getUTCMonth()]};
+const dowName=n=>DOW[D(n).getUTCDay()];
+const fmtRange=(a,b)=>{const da=D(a),db=D(b);return da.getUTCMonth()===db.getUTCMonth()?"del "+da.getUTCDate()+" al "+db.getUTCDate()+" de "+MESL[db.getUTCMonth()]:"del "+fmtLong(a)+" al "+fmtLong(b)};
+const esc=s=>String(s==null?"":s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const plural=(n,a,b)=>n+" "+(Math.abs(n)===1?a:b);
+
+const MOODS=["Bien","Tranquila","Con energía","Cansada","Sensible","Irritable","Triste","Ansiosa","Con dolor"];
+const LS_KEY="luna-ciclo-v1";
+
+/* ---------- Estado ---------- */
+let state=load();
+function load(){
+  try{const raw=localStorage.getItem(LS_KEY);if(raw){const s=JSON.parse(raw);if(s&&Array.isArray(s.periods)){s.settings=Object.assign({luteal:14},s.settings||{});return s}}}catch(e){}
+  return {periods:demoData(),settings:{luteal:14},demo:true};
+}
+function save(){try{localStorage.setItem(LS_KEY,JSON.stringify(state))}catch(e){}}
+function uid(){return Math.random().toString(36).slice(2,10)}
+
+function demoData(){
+  // Ejemplo reproducible: ciclos de 27 a 32 días, algo más largos en invierno, que acaba con un ciclo empezado hace 12 días
+  let seed=7;const rnd=()=>{seed=(seed*16807)%2147483647;return seed/2147483647};
+  const out=[];let s=todayN()-12;
+  const notes=["","","Semana de exámenes","","Viaje a Valencia","","","Mucho estrés en el trabajo","",""];
+  for(let i=0;i<44;i++){
+    const m=D(s).getUTCMonth();const winter=(m===11||m<=1)?1:0;
+    const pl=4+Math.round(rnd()*2);
+    const moods=[];if(rnd()<.55)moods.push(MOODS[Math.floor(rnd()*MOODS.length)]);if(rnd()<.25)moods.push("Con dolor");
+    out.push({id:uid(),start:toS(s),end:toS(s+pl-1),moods:[...new Set(moods)],note:notes[i%notes.length]});
+    s-= 28+winter+Math.round((rnd()-.5)*3.2);
+  }
+  out[0].end=toS(todayN()-12+4);
+  return out.reverse();
+}
+
+/* ---------- Modelo de ciclo y predicción ---------- */
+function sorted(){return state.periods.slice().sort((a,b)=>a.start<b.start?-1:a.start>b.start?1:0).map(p=>({...p,s:toN(p.start),e:p.end?toN(p.end):null}))}
+function buildCycles(P){
+  const c=[];
+  for(let i=0;i<P.length-1;i++){const len=P[i+1].s-P[i].s;c.push({s:P[i].s,len,valid:len>=21&&len<=45,plen:P[i].e!=null?P[i].e-P[i].s+1:null,p:P[i]})}
+  return c;
+}
+function predictLen(prev,refStart,alpha){
+  const valid=prev.filter(c=>c.valid);
+  if(!valid.length)return null;
+  const recent=valid.slice(-6).reverse();let w=1,sw=0,sv=0;
+  for(const c of recent){sv+=c.len*w;sw+=w;w*=0.8}
+  const R=sv/sw;
+  const sea=[];
+  for(const c of valid){const ago=refStart-c.s;if(ago<300)continue;const yrs=Math.round(ago/365.25);if(Math.abs(ago-yrs*365.25)<=45)sea.push({len:c.len,w:Math.pow(0.8,yrs-1)})}
+  let E=null;
+  if(sea.length>=2){let a=0,b=0;for(const x of sea){a+=x.len*x.w;b+=x.w}E=a/b}
+  const used=E==null?1:alpha;
+  return {R,E,alpha:used,nSea:sea.length,len:E==null?R:used*R+(1-used)*E};
+}
+function backtest(cycles){
+  const alphas=[1,0.9,0.8,0.7,0.6,0.5];let best=null;
+  for(const a of alphas){
+    const errs=[];
+    for(let i=6;i<cycles.length;i++){if(!cycles[i].valid)continue;const pr=predictLen(cycles.slice(0,i),cycles[i].s,a);if(!pr)continue;errs.push(cycles[i].len-pr.len)}
+    if(!errs.length)continue;
+    const mae=errs.reduce((x,y)=>x+Math.abs(y),0)/errs.length;
+    if(!best||mae<best.mae-0.005)best={alpha:a,mae,errs};
+  }
+  return best;
+}
+function weighted(vals){let w=1,sw=0,sv=0;for(const v of vals.slice().reverse()){sv+=v*w;sw+=w;w*=0.8}return sw?sv/sw:null}
+
+function computeModel(){
+  const P=sorted();
+  if(!P.length)return null;
+  const cycles=buildCycles(P);
+  const bt=backtest(cycles);
+  const alpha=bt?bt.alpha:1;
+  const last=P[P.length-1];
+  const pred=predictLen(cycles,last.s,alpha);
+  const fallback=28;
+  const len=pred?pred.len:fallback;
+  const plens=cycles.map(c=>c.plen).concat(last.e!=null?[last.e-last.s+1]:[]).filter(x=>x!=null&&x>0&&x<=12).slice(-6);
+  const plen=Math.max(1,Math.round(weighted(plens)||5));
+  let hw=3;
+  if(bt&&bt.errs.length>=5){const a=bt.errs.map(Math.abs).sort((x,y)=>x-y);hw=Math.round(a[Math.min(a.length-1,Math.floor(a.length*0.8))]);hw=Math.max(2,Math.min(6,hw))}
+  const nextStart=last.s+Math.round(len);
+  const today=todayN();
+  const luteal=state.settings.luteal||14;
+  const ov=nextStart-luteal;
+  const lastEnd=last.e!=null?last.e:last.s+plen-1;
+  const active=last.e==null&&today-last.s<12;
+  return {P,cycles,bt,alpha,pred,len,plen,hw,nextStart,rangeA:nextStart-hw,rangeB:nextStart+hw,ov,fertA:ov-5,fertB:ov,luteal,last,lastEnd,active,today,dayOfCycle:today-last.s+1};
+}
+
+const PHASES={
+  regla:{name:"Menstruación",k:"var(--period)",txt:"Es habitual notar cólicos, cansancio o dolor de espalda. El calor local y descansar suelen ayudar."},
+  folicular:{name:"Fase folicular",k:"var(--ok)",txt:"Suben los estrógenos. Muchas personas notan más energía y mejor ánimo en estos días."},
+  fertil:{name:"Ventana fértil",k:"var(--fertile)",txt:"Son los 6 días con posibilidad de embarazo. El flujo suele volverse más claro y elástico."},
+  ovulacion:{name:"Ovulación estimada",k:"var(--ovu)",txt:"Algunas personas notan un leve dolor en un lado del bajo vientre o más flujo."},
+  lutea:{name:"Fase lútea",k:"var(--muted)",txt:"Sube la progesterona. Suele ser una etapa estable, aunque puede aparecer algo de cansancio."},
+  pms:{name:"Fase premenstrual",k:"var(--pms)",txt:"Es habitual notar cambios de humor, irritabilidad, hinchazón o el pecho sensible. Suele aliviarse en los primeros días de regla."},
+  retraso:{name:"Regla con retraso",k:"var(--pms)",txt:"Un retraso de unos días es frecuente por estrés, viajes o enfermedad. Si se alarga mucho, conviene consultarlo."}
+};
+function phaseFor(m,n){
+  if(n>=m.last.s&&n<=(m.active?Math.max(m.lastEnd,m.today):m.lastEnd))return "regla";
+  if(n>m.rangeB)return "retraso";
+  if(n===m.ov)return "ovulacion";
+  if(n>=m.fertA&&n<=m.fertB)return "fertil";
+  if(n>=m.nextStart-5&&n<m.nextStart)return "pms";
+  if(n<m.fertA)return "folicular";
+  if(n>=m.nextStart)return "pms";
+  return "lutea";
+}
+
+/* ---------- Navegación ---------- */
+let tab="hoy";
+try{const h=location.hash.replace("#","");if(["hoy","cal","stats","datos"].includes(h))tab=h}catch(e){}
+const $=id=>document.getElementById(id);
+document.querySelectorAll(".tabs button").forEach(b=>b.addEventListener("click",()=>{tab=b.dataset.tab;calSel=null;render();window.scrollTo({top:0})}));
+$("startOwn").addEventListener("click",()=>openClear(true));
+
+function render(){
+  const t=todayN();
+  $("todayLabel").textContent=dowName(t)+" "+fmtLong(t);
+  $("demoBanner").hidden=!state.demo;
+  document.querySelectorAll(".tabs button").forEach(b=>b.setAttribute("aria-current",b.dataset.tab===tab?"page":"false"));
+  const m=computeModel();
+  const v=$("view");
+  if(tab==="hoy")v.innerHTML=viewHoy(m);
+  else if(tab==="cal")v.innerHTML=viewCal(m);
+  else if(tab==="stats")v.innerHTML=viewStats(m);
+  else v.innerHTML=viewDatos(m);
+  bind(m);
+  if(tab==="stats"){const sc=v.querySelector(".chart-scroll");if(sc)sc.scrollLeft=sc.scrollWidth}
+}
+
+/* ---------- Hoy ---------- */
+function ringSVG(m){
+  const T=Math.max(Math.round(m.len),m.dayOfCycle,21);
+  const r=88,C=2*Math.PI*r;
+  const seg=(a,b,color,w,op)=>{a=Math.max(1,a);b=Math.min(T,b);if(b<a)return "";const len=(b-a+1)/T*C-2;const off=-((a-1)/T*C+1);return `<circle cx="110" cy="110" r="${r}" fill="none" stroke="${color}" stroke-width="${w}" stroke-linecap="round" stroke-dasharray="${len.toFixed(1)} ${C.toFixed(1)}" stroke-dashoffset="${off.toFixed(1)}" opacity="${op||1}" transform="rotate(-90 110 110)"/>`};
+  const rel=n=>n-m.last.s+1;
+  const pe=rel(m.active?Math.max(m.lastEnd,m.today):m.lastEnd);
+  let s=`<circle cx="110" cy="110" r="${r}" fill="none" stroke="var(--surface2)" stroke-width="14"/>`;
+  s+=seg(1,pe,"var(--period)",14);
+  s+=seg(rel(m.fertA),rel(m.fertB),"var(--fertile)",14,.85);
+  s+=seg(rel(m.nextStart-5),rel(m.nextStart-1),"var(--pms)",14,.55);
+  // progreso
+  const d=Math.min(m.dayOfCycle,T);const ang=((d-0.5)/T)*2*Math.PI-Math.PI/2;
+  const oa=((rel(m.ov)-0.5)/T)*2*Math.PI-Math.PI/2;
+  if(rel(m.ov)>=1&&rel(m.ov)<=T)s+=`<circle cx="${(110+Math.cos(oa)*r).toFixed(1)}" cy="${(110+Math.sin(oa)*r).toFixed(1)}" r="4" fill="var(--ovu)"/>`;
+  const x=110+Math.cos(ang)*r,y=110+Math.sin(ang)*r;
+  s+=`<circle cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="12" fill="var(--bg)" stroke="var(--fg)" stroke-width="3"/>`;
+  return `<svg viewBox="0 0 220 220" role="img" aria-label="Día ${m.dayOfCycle} de un ciclo previsto de ${Math.round(m.len)} días">${s}</svg>`;
+}
+function viewHoy(m){
+  if(!m)return emptyView();
+  const t=m.today,ph=phaseFor(m,t),P=PHASES[ph];
+  let nextTxt,nextSub;
+  if(m.active){
+    nextTxt=`Día ${t-m.last.s+1} de regla`;nextSub=`Suele durarle ${plural(m.plen,"día","días")}. Pulsa «Ha terminado» cuando acabe.`;
+  }else if(t>m.rangeB){
+    nextTxt=fmtRange(m.rangeA,m.rangeB);nextSub=`<span class="late">Lleva ${plural(t-m.nextStart,"día","días")} de retraso sobre lo previsto.</span>`;
+  }else if(t>=m.rangeA){
+    nextTxt=fmtRange(m.rangeA,m.rangeB);nextSub=`Puede venir cualquier día de estos. Lo más probable, el ${fmtLong(m.nextStart)}.`;
+  }else{
+    nextTxt=fmtRange(m.rangeA,m.rangeB);nextSub=`Lo más probable, el ${dowName(m.nextStart)} ${fmtLong(m.nextStart)}. Faltan ${plural(m.nextStart-t,"día","días")}.`;
+  }
+  const fertPast=t>m.fertB;
+  const fertTxt=fertPast?"Ya pasó en este ciclo":(t>=m.fertA?"Ahora, hasta el "+fmt(m.fertB):fmtRange(m.fertA,m.fertB));
+  const hr=new Date().getHours();const hello=hr<6?"Buenas noches":hr<13?"Buenos días":hr<21?"Buenas tardes":"Buenas noches";
+  return `
+  <div class="hello">${hello}</div>
+  <div class="ringwrap">${ringSVG(m)}<div class="ring-in"><b>${m.dayOfCycle}</b><span>día del ciclo</span><span>de unos ${Math.round(m.len)}</span></div></div>
+  <span class="pill" style="--k:${P.k}"><i></i>${P.name}</span>
+  <section class="card next" aria-label="Próxima regla">
+    <div class="eyebrow">${m.active?"Regla en curso":"Próxima regla"}</div>
+    <strong class="big">${nextTxt}</strong>
+    <div class="muted" style="font-size:.9rem">${nextSub}</div>
+  </section>
+  <div class="actions">
+    ${m.active
+      ?`<button class="btn" type="button" data-act="endToday">Ha terminado hoy</button><button class="linkbtn" type="button" data-act="endOther">Terminó otro día</button>`
+      :`<button class="btn" type="button" data-act="startToday">Me ha venido hoy</button><button class="linkbtn" type="button" data-act="startOther">Me vino otro día</button>`}
+  </div>
+  <section class="card">
+    <div class="row2">
+      <div class="kv"><small>Ventana fértil</small><strong style="font-size:1.05rem">${fertTxt}</strong><span>Ovulación hacia el ${fmt(m.ov)}</span></div>
+      <div class="kv"><small>Ciclo y regla</small><strong style="font-size:1.05rem">${Math.round(m.len)} y ${m.plen} días</strong><span>Previsión de duración</span></div>
+    </div>
+  </section>
+  <section class="card">
+    <div class="eyebrow">Qué es habitual ahora</div>
+    <p class="phase-text">${P.txt}</p>
+    <div class="legend"><em style="--k:var(--period)">Regla</em><em style="--k:var(--fertile)">Fértil</em><em style="--k:var(--ovu)">Ovulación</em><em style="--k:var(--pms)">Premenstrual</em></div>
+  </section>
+  ${m.active?`<button class="linkbtn" type="button" data-edit="${m.last.id}">Añadir ánimo o nota a esta regla</button>`:""}
+  <p class="small-print">Estimaciones orientativas a partir de tus fechas. No sirven como método anticonceptivo.</p>`;
+}
+function emptyView(){
+  return `<div class="empty">
+    <svg class="moon" viewBox="0 0 24 24" aria-hidden="true"><path d="M15.5 3.2A9 9 0 1 0 20.8 15 7.2 7.2 0 0 1 15.5 3.2Z" fill="var(--surface2)" stroke="var(--period)" stroke-width=".8"/></svg>
+    <h2 style="font-family:var(--f-display);font-weight:500">Aún no hay reglas registradas</h2>
+    <p class="muted" style="margin:0;max-width:32ch">Añade la última regla para empezar. Con dos o más, Luna calcula tu ciclo y predice la siguiente.</p>
+    <div class="actions" style="width:100%;max-width:340px">
+      <button class="btn" type="button" data-act="startToday">Me ha venido hoy</button>
+      <button class="btn ghost" type="button" data-goto="cal">Añadir desde el calendario</button>
+      <button class="btn ghost" type="button" data-goto="datos">Importar un CSV</button>
+    </div>
+  </div>`;
+}
+
+/* ---------- Calendario ---------- */
+let calMonth=null; // número de día del 1 del mes mostrado
+let calSel=null;   // {a:n, b:n|null} en modo añadir
+function viewCal(m){
+  const t=todayN();
+  if(calMonth==null){const d=D(t);calMonth=Math.round(Date.UTC(d.getUTCFullYear(),d.getUTCMonth(),1)/DAY)}
+  const d0=D(calMonth),y=d0.getUTCFullYear(),mo=d0.getUTCMonth();
+  const days=new Date(Date.UTC(y,mo+1,0)).getUTCDate();
+  const lead=(d0.getUTCDay()+6)%7;
+  const P=m?m.P:[];
+  const perOf=n=>P.find(p=>n>=p.s&&n<=(p.e!=null?p.e:(m&&p===m.last?Math.max(m.lastEnd,m.active?t:m.lastEnd):p.s+4)));
+  // proyección de 3 ciclos futuros
+  const proj=[];
+  if(m){const L=Math.round(m.len);for(let k=0;k<3;k++){const S=m.nextStart+k*L;proj.push({S,ov:S-m.luteal})}}
+  let cells="";
+  ["lu","ma","mi","ju","vi","sá","do"].forEach(x=>cells+=`<div class="dow">${x}</div>`);
+  for(let i=0;i<lead;i++)cells+=`<div class="day out" aria-hidden="true"></div>`;
+  for(let i=1;i<=days;i++){
+    const n=calMonth+i-1;const cls=["day"];let label=fmtLong(n);
+    const per=perOf(n);
+    if(per){cls.push("per");label+=", regla"}
+    else if(m&&n>m.lastEnd){
+      for(const p of proj){
+        if(n>=p.S&&n<p.S+m.plen&&!(m.active)){cls.push("pred");label+=", regla prevista";break}
+        if(n===p.ov){cls.push("ovu","fert");label+=", ovulación estimada";break}
+        if(n>=p.ov-5&&n<p.ov){cls.push("fert");label+=", ventana fértil";break}
+        if(n>=p.S-5&&n<p.S){cls.push("pms");break}
+      }
+      if(m.active&&!per){for(const p of proj){if(n>=p.S&&n<p.S+m.plen){cls.push("pred");break}}}
+    }
+    if(n===t){cls.push("today");label+=", hoy"}
+    if(calSel){const a=calSel.a,b=calSel.b==null?a:calSel.b;if(n===a||n===b)cls.push("sel");else if(n>Math.min(a,b)&&n<Math.max(a,b))cls.push("selr")}
+    const hasNote=per&&(per.note||(per.moods&&per.moods.length))&&n===per.s;
+    cells+=`<button type="button" class="${cls.join(" ")}${hasNote?" note-dot":""}" data-day="${n}" aria-label="${esc(label)}">${i}${hasNote?'<span class="nd"></span>':""}</button>`;
+  }
+  const hint=calSel?(calSel.b==null?"Ahora toca el último día de sangrado, o guarda si aún no ha terminado.":"Comprueba las fechas y pulsa Siguiente."):"Toca un día de regla para editarla, o cualquier otro día para añadir una regla que empieza ahí.";
+  return `
+  <div class="calhead">
+    <button class="iconbtn" type="button" data-cal="-1" aria-label="Mes anterior"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M15 5l-7 7 7 7"/></svg></button>
+    <h2>${MESL[mo]} ${y}</h2>
+    <button class="iconbtn" type="button" data-cal="1" aria-label="Mes siguiente"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M9 5l7 7-7 7"/></svg></button>
+  </div>
+  <section class="card"><div class="grid">${cells}</div></section>
+  <p class="hint">${hint}</p>
+  ${calSel?`<div class="addbar"><button class="btn ghost" type="button" data-act="calCancel">Cancelar</button><button class="btn" type="button" data-act="calNext">Siguiente</button></div>`:`<div class="addbar"><button class="btn ghost" type="button" data-act="calToday">Ir a hoy</button><button class="btn violet" type="button" data-act="calAdd">Añadir regla</button></div>`}
+  <div class="legend" style="justify-content:center"><em style="--k:var(--period)">Regla</em><em style="--k:var(--period-soft);--b:2px solid var(--period)">Prevista</em><em style="--k:var(--fertile-soft)">Fértil</em><em style="--k:transparent;--b:2px solid var(--fertile)">Ovulación</em><em style="--k:var(--pms-soft)">Premenstrual</em></div>`;
+}
+
+/* ---------- Estadísticas ---------- */
+function viewStats(m){
+  if(!m||m.cycles.length<1)return `<section class="card"><h2>Estadísticas</h2><p class="muted" style="margin:0">Necesitas al menos dos reglas registradas para ver la duración de tus ciclos.</p></section>`;
+  const C=m.cycles;
+  const valid=C.filter(c=>c.valid);
+  const last6=valid.slice(-6);
+  const avgC=last6.length?Math.round(last6.reduce((a,c)=>a+c.len,0)/last6.length):null;
+  const pl=m.P.map(p=>p.e!=null?p.e-p.s+1:null).filter(x=>x).slice(-6);
+  const avgP=pl.length?Math.round(pl.reduce((a,b)=>a+b,0)/pl.length):null;
+  const yr=valid.filter(c=>c.s>=m.today-365);
+  const ref=yr.length>=3?yr:valid.slice(-12);
+  const mn=Math.min(...ref.map(c=>c.len)),mx=Math.max(...ref.map(c=>c.len));
+  const regular=mx-mn<=7;
+  const maxLen=Math.max(35,...C.map(c=>c.len));
+  let bars="";
+  C.forEach((c,i)=>{
+    const d=D(c.s);const showY=i===0||d.getUTCMonth()===0;
+    bars+=`<div class="cbar"><div class="nums"><b>${c.len}</b><span>${c.plen??"–"}</span></div><div class="pair"><i class="c" style="height:${(c.len/maxLen*100).toFixed(1)}%;${c.valid?"":"opacity:.35"}"></i><i class="p" style="height:${((c.plen||0)/maxLen*100).toFixed(1)}%"></i></div><small>${MES[d.getUTCMonth()]}${showY?"<br>"+d.getUTCFullYear():""}</small></div>`;
+  });
+  // ciclo actual
+  const cur=m.dayOfCycle;const cd=D(m.last.s);
+  bars+=`<div class="cbar cur"><div class="nums"><b>${cur}</b><span>${m.last.e!=null?m.last.e-m.last.s+1:"…"}</span></div><div class="pair"><i class="c" style="height:${(Math.min(cur,maxLen)/maxLen*100).toFixed(1)}%"></i><i class="p" style="height:${((m.last.e!=null?m.last.e-m.last.s+1:cur)/maxLen*100).toFixed(1)}%"></i></div><small>Este<br>ciclo</small></div>`;
+  // por mes del año
+  const bym=Array.from({length:12},()=>[]);valid.forEach(c=>bym[D(c.s).getUTCMonth()].push(c.len));
+  const mavg=bym.map(a=>a.length?a.reduce((x,y)=>x+y,0)/a.length:null);
+  const present=mavg.filter(x=>x!=null);const lo=Math.min(...present,26)-2,hi=Math.max(...present,31);
+  let months="";mavg.forEach((v,i)=>{months+=`<div class="m">${v!=null?`<b>${v.toFixed(0)}</b><i style="height:${((v-lo)/(hi-lo)*70+8).toFixed(0)}px"></i>`:`<b class="muted">·</b><i class="none"></i>`}<small>${MES[i].slice(0,1).toUpperCase()}</small></div>`});
+  // ánimo
+  const counts={};m.P.forEach(p=>(p.moods||[]).forEach(x=>counts[x]=(counts[x]||0)+1));
+  const ms=Object.entries(counts).sort((a,b)=>b[1]-a[1]);const mmax=ms.length?ms[0][1]:1;
+  const withMood=m.P.filter(p=>p.moods&&p.moods.length).length;
+  const bt=m.bt;
+  const seaTxt=m.pred&&m.pred.E!=null?`Ahora mismo: lo reciente apunta a ${m.pred.R.toFixed(1)} días y la misma época de años anteriores a ${m.pred.E.toFixed(1)} (${m.pred.nSea} ciclos).`:"Aún no hay ciclos de la misma época en años anteriores, así que solo cuenta lo reciente.";
+  return `
+  <section class="card">
+    <div class="row2">
+      <div class="kv"><small>Ciclo medio</small><strong>${avgC??"–"} días</strong><span>últimos ${last6.length} ciclos</span></div>
+      <div class="kv"><small>Regla media</small><strong>${avgP??"–"} días</strong><span>últimas ${pl.length} reglas</span></div>
+    </div>
+    <div class="regular"><i style="--k:${regular?"var(--ok)":"var(--pms)"}"></i><span>${regular?"Ciclos regulares":"Ciclos algo irregulares"}: entre ${mn} y ${mx} días en el último año (${regular?"diferencia de 7 días o menos":"diferencia de más de 7 días"}).</span></div>
+  </section>
+  <section class="card">
+    <h2>Ciclo y regla por mes</h2>
+    <div class="legend"><em style="--k:var(--fertile)">Ciclo (días)</em><em style="--k:var(--period)">Regla (días)</em></div>
+    <div class="chart-scroll"><div class="chart">${bars}</div></div>
+    <p class="small-print" style="margin:0">Desliza hacia la izquierda para ver ciclos anteriores. Los ciclos atenuados quedan fuera de la predicción por ser menores de 21 o mayores de 45 días.</p>
+  </section>
+  <section class="card">
+    <h2>Duración del ciclo según la época</h2>
+    <p class="muted" style="margin:0;font-size:.88rem">Media de los ciclos que empezaron en cada mes, con todo tu historial.</p>
+    <div class="months">${months}</div>
+  </section>
+  <section class="card">
+    <h2>Cómo predice Luna</h2>
+    ${bt?`<p style="margin:0">Probando con tus propios ciclos, las predicciones pasadas fallaron de media <b>${bt.mae.toFixed(1)} días</b> (${bt.errs.length} ciclos comprobados). Por eso el rango es de ±${m.hw} días.</p>
+    <p style="margin:0">La mejor combinación para ti: <b>${Math.round(m.alpha*100)} %</b> ciclos recientes y <b>${Math.round((1-m.alpha)*100)} %</b> misma época de años anteriores.</p>`:`<p style="margin:0">Con más de 7 ciclos registrados, Luna comprobará qué combinación de ciclos recientes y misma época del año acierta más contigo.</p>`}
+    <p class="small-print" style="margin:0">${seaTxt}</p>
+  </section>
+  <section class="card">
+    <h2>Ánimo registrado</h2>
+    ${ms.length?`<div class="moodbars">${ms.map(([k,v])=>`<div class="moodbar"><span>${esc(k)}</span><span class="track"><i style="width:${(v/mmax*100).toFixed(0)}%"></i></span><b>${v}</b></div>`).join("")}</div><p class="small-print" style="margin:0">En ${withMood} de ${m.P.length} reglas registraste el ánimo.</p>`:`<p class="muted" style="margin:0">Aún no has marcado el ánimo en ninguna regla. Puedes hacerlo al registrarla o desde el calendario.</p>`}
+  </section>`;
+}
+
+/* ---------- Datos ---------- */
+let importMsg=null,showAll=false;
+function viewDatos(m){
+  const P=m?m.P.slice().reverse():[];
+  const lis=P.slice(0,showAll?P.length:12).map((p,i)=>{
+    const next=P[i-1];const cyc=next?next.s-p.s:null;const len=p.e!=null?p.e-p.s+1:null;
+    const sub=[(p.moods||[]).join(", "),p.note].filter(Boolean).join(" · ");
+    return `<li><button type="button" data-edit="${p.id}"><span class="d">${p.e!=null?(D(p.s).getUTCMonth()===D(p.e).getUTCMonth()?D(p.s).getUTCDate()+"–"+fmtY(p.e):fmt(p.s)+" – "+fmtY(p.e)):fmtY(p.s)+" · en curso"}</span><span class="len">${len?len+" d regla":""}${cyc?" · ciclo "+cyc:""}</span>${sub?`<span class="s">${esc(sub)}</span>`:""}</button></li>`;
+  }).join("");
+  return `
+  <section class="card">
+    <h2>Historial</h2>
+    <p class="muted" style="margin:0;font-size:.9rem">Toca una regla para cambiar fechas, ánimo o nota.</p>
+    ${P.length?`<ul class="hist">${lis}</ul>${P.length>12?`<button class="linkbtn" type="button" data-act="toggleAll">${showAll?"Ver solo las últimas 12":"Ver las "+P.length+" reglas"}</button>`:""}`:`<p class="muted" style="margin:0">Sin reglas todavía.</p>`}
+  </section>
+  <section class="card">
+    <h2>Importar reglas</h2>
+    <p class="muted" style="margin:0;font-size:.9rem">Desde un archivo CSV o pegando el texto. Se ignoran las reglas que ya existan con la misma fecha de inicio.</p>
+    <details><summary>Formato del CSV</summary>
+      <pre class="fmt">inicio;fin;animo;nota
+2021-11-04;2021-11-08;Cansada;
+05/12/2021;09/12/2021;Bien|Con dolor;Viaje</pre>
+      <p class="small-print">Fechas como AAAA-MM-DD o DD/MM/AAAA. Separador punto y coma o coma. La fila de títulos es opcional. Solo «inicio» es obligatorio; varios ánimos se separan con «|».</p>
+    </details>
+    <div class="field"><label for="csvFile">Archivo</label><input type="file" id="csvFile" accept=".csv,.txt,text/csv,text/plain"></div>
+    <div class="field"><label for="csvText">O pega aquí el contenido</label><textarea id="csvText" class="code" placeholder="inicio;fin;animo;nota"></textarea></div>
+    <div class="btnrow"><button class="btn small" type="button" data-act="import">Importar</button></div>
+    ${importMsg?`<div class="msg ${importMsg.cls}">${importMsg.html}</div>`:""}
+  </section>
+  <section class="card">
+    <h2>Copia de seguridad</h2>
+    <p class="muted" style="margin:0;font-size:.9rem">Tus datos solo están en este navegador. Guarda una copia de vez en cuando: si se borran los datos del navegador, se pierden.</p>
+    <div class="btnrow"><button class="btn small violet" type="button" data-act="exportShow">Exportar CSV</button></div>
+    <div id="exportBox" hidden class="field"><textarea id="exportText" class="code" readonly></textarea><div class="btnrow"><button class="btn small ghost" type="button" data-act="copy">Copiar</button><button class="btn small ghost" type="button" data-act="download">Descargar archivo</button></div><span class="small-print" id="exportNote"></span></div>
+  </section>
+  <section class="card">
+    <h2>Ajustes</h2>
+    <div class="field"><span class="lbl">Días entre ovulación y regla</span>
+      <div class="seg" role="group" aria-label="Días entre ovulación y regla">${[12,13,14].map(v=>`<button type="button" data-luteal="${v}" aria-pressed="${state.settings.luteal===v}">${v}</button>`).join("")}</div>
+      <span class="small-print">14 es lo estándar. Estudios con muchos ciclos reales dan una media cercana a 12 o 13.</span>
+    </div>
+    <div class="btnrow">
+      ${state.demo?"":`<button class="btn small ghost" type="button" data-act="loadDemo">Ver datos de ejemplo</button>`}
+      <button class="btn small danger" type="button" data-act="clearAll">Borrar todos los datos</button>
+    </div>
+  </section>
+  <p class="small-print">Luna estima la ovulación y la ventana fértil a partir de tus fechas. Es orientativo y no sirve como método anticonceptivo.</p>`;
+}
+
+/* ---------- CSV ---------- */
+function parseDate(s){
+  s=(s||"").trim().replace(/^"|"$/g,"");if(!s)return null;
+  let y,mo,d,r;
+  if((r=s.match(/^(\d{4})[-\/.](\d{1,2})[-\/.](\d{1,2})$/))){y=+r[1];mo=+r[2];d=+r[3]}
+  else if((r=s.match(/^(\d{1,2})[-\/.](\d{1,2})[-\/.](\d{4})$/))){d=+r[1];mo=+r[2];y=+r[3]}
+  else return undefined;
+  const dt=new Date(Date.UTC(y,mo-1,d));
+  if(dt.getUTCFullYear()!==y||dt.getUTCMonth()!==mo-1||dt.getUTCDate()!==d)return undefined;
+  return toS(Math.round(dt.getTime()/DAY));
+}
+function splitLine(line,sep){
+  const out=[];let cur="",q=false;
+  for(let i=0;i<line.length;i++){const ch=line[i];
+    if(q){if(ch==='"'){if(line[i+1]==='"'){cur+='"';i++}else q=false}else cur+=ch}
+    else if(ch==='"')q=true;else if(ch===sep){out.push(cur);cur=""}else cur+=ch}
+  out.push(cur);return out.map(x=>x.trim());
+}
+function parseCSV(text){
+  const lines=text.replace(/^﻿/,"").split(/\r?\n/).filter(l=>l.trim());
+  if(!lines.length)return {rows:[],errors:["El texto está vacío."]};
+  const sep=(lines[0].split(";").length>=lines[0].split(",").length)?";":",";
+  const rows=[],errors=[];
+  lines.forEach((l,i)=>{
+    const f=splitLine(l,sep);
+    const a=parseDate(f[0]);
+    if(a===undefined){if(i===0)return;errors.push(`Línea ${i+1}: no entiendo la fecha «${esc(f[0])}».`);return}
+    if(a===null){errors.push(`Línea ${i+1}: falta la fecha de inicio.`);return}
+    let b=parseDate(f[1]);
+    if(b===undefined){errors.push(`Línea ${i+1}: fecha de fin «${esc(f[1])}» no válida; se guarda sin fin.`);b=null}
+    if(b&&b<a){errors.push(`Línea ${i+1}: el fin es anterior al inicio; se guarda sin fin.`);b=null}
+    if(b&&toN(b)-toN(a)>14){errors.push(`Línea ${i+1}: regla de más de 15 días; se guarda sin fin.`);b=null}
+    const moods=(f[2]||"").split("|").map(x=>x.trim()).filter(Boolean);
+    rows.push({id:uid(),start:a,end:b,moods,note:f.slice(3).join(sep==";"?"; ":", ").trim()});
+  });
+  return {rows,errors};
+}
+function toCSV(){
+  const q=s=>/[;"\n]/.test(s)?'"'+s.replace(/"/g,'""')+'"':s;
+  const P=sorted();
+  return "inicio;fin;animo;nota\n"+P.map(p=>[p.start,p.end||"",(p.moods||[]).join("|"),q(p.note||"")].join(";")).join("\n");
+}
+function doImport(text){
+  const {rows,errors}=parseCSV(text);
+  if(state.demo){state.periods=[];state.demo=false}
+  const have=new Set(state.periods.map(p=>p.start));
+  let added=0,dup=0;
+  for(const r of rows){if(have.has(r.start)){dup++;continue}have.add(r.start);state.periods.push(r);added++}
+  save();
+  let html=`Importadas ${plural(added,"regla","reglas")}.`;
+  if(dup)html+=` ${plural(dup,"ya existía","ya existían")}.`;
+  if(errors.length)html+=`<br>${errors.slice(0,6).join("<br>")}${errors.length>6?`<br>y ${errors.length-6} avisos más.`:""}`;
+  importMsg={cls:added?"ok":"err",html};
+  render();
+}
+
+/* ---------- Hoja inferior (editar / añadir) ---------- */
+function openSheet(html,onBind){
+  $("sheetIn").innerHTML=`<div class="grab"></div>`+html;
+  $("scrim").hidden=false;$("sheet").hidden=false;
+  requestAnimationFrame(()=>{$("scrim").classList.add("show");$("sheet").classList.add("show")});
+  $("scrim").onclick=closeSheet;
+  if(onBind)onBind($("sheetIn"));
+  const f=$("sheetIn").querySelector("h3");if(f){f.setAttribute("tabindex","-1");f.focus({preventScroll:true})}
+}
+function closeSheet(){
+  $("scrim").classList.remove("show");$("sheet").classList.remove("show");
+  setTimeout(()=>{$("scrim").hidden=true;$("sheet").hidden=true},220);
+}
+document.addEventListener("keydown",e=>{if(e.key==="Escape"&&!$("sheet").hidden)closeSheet()});
+
+function periodForm(p,title){
+  const ongoing=!p.end;
+  return `<h3 id="sheetTitle">${title}</h3>
+  <div class="row2">
+    <div class="field"><label for="fStart">Primer día</label><input type="date" id="fStart" value="${p.start}" max="${toS(todayN())}"></div>
+    <div class="field"><label for="fEnd">Último día</label><input type="date" id="fEnd" value="${p.end||""}" ${ongoing?"disabled":""}></div>
+  </div>
+  <label class="check"><input type="checkbox" id="fOngoing" ${ongoing?"checked":""}> Aún no ha terminado</label>
+  <div class="field"><span class="lbl">Ánimo (opcional)</span><div class="chips" id="fMoods">${MOODS.map(x=>`<button type="button" class="chip" aria-pressed="${(p.moods||[]).includes(x)}" data-mood="${esc(x)}">${esc(x)}</button>`).join("")}</div></div>
+  <div class="field"><label for="fNote">Nota (opcional)</label><textarea id="fNote" placeholder="Cómo te has sentido, algo importante que pasara…">${esc(p.note||"")}</textarea></div>
+  <div id="fErr" class="msg err" hidden></div>
+  <button class="btn" type="button" id="fSave">Guardar</button>
+  ${p.id?`<button class="btn danger" type="button" id="fDel">Eliminar esta regla</button>`:`<button class="btn ghost" type="button" id="fCancel">Cancelar</button>`}`;
+}
+function bindForm(root,p,isNew){
+  const og=root.querySelector("#fOngoing"),fe=root.querySelector("#fEnd");
+  og.addEventListener("change",()=>{fe.disabled=og.checked;if(og.checked)fe.value=""});
+  root.querySelectorAll(".chip").forEach(c=>c.addEventListener("click",()=>c.setAttribute("aria-pressed",c.getAttribute("aria-pressed")==="true"?"false":"true")));
+  const err=t=>{const e=root.querySelector("#fErr");e.textContent=t;e.hidden=false};
+  root.querySelector("#fSave").addEventListener("click",()=>{
+    const s=root.querySelector("#fStart").value,e=og.checked?"":fe.value;
+    if(!s)return err("Elige el primer día de la regla.");
+    if(toN(s)>todayN())return err("El primer día no puede ser futuro.");
+    if(e&&e<s)return err("El último día no puede ser anterior al primero.");
+    if(e&&toN(e)-toN(s)>14)return err("Una regla de más de 15 días parece un error. Revisa las fechas.");
+    const a=toN(s),b=e?toN(e):a;
+    const clash=state.periods.find(q=>q.id!==p.id&&(()=>{const qa=toN(q.start),qb=q.end?toN(q.end):qa;return a<=qb&&b>=qa})());
+    if(clash)return err(`Se solapa con la regla del ${fmtY(toN(clash.start))}.`);
+    if(!og.checked&&!e)return err("Indica el último día o marca «Aún no ha terminado».");
+    const moods=[...root.querySelectorAll(".chip[aria-pressed=true]")].map(c=>c.dataset.mood);
+    const note=root.querySelector("#fNote").value.trim();
+    if(isNew){state.periods.push({id:uid(),start:s,end:e||null,moods,note})}
+    else{const q=state.periods.find(q=>q.id===p.id);Object.assign(q,{start:s,end:e||null,moods,note})}
+    save();closeSheet();calSel=null;render();toast(isNew?"Regla guardada":"Cambios guardados");
+  });
+  const del=root.querySelector("#fDel");
+  if(del){let armed=false;del.addEventListener("click",()=>{
+    if(!armed){armed=true;del.textContent="Pulsa otra vez para eliminar";return}
+    const idx=state.periods.findIndex(q=>q.id===p.id);const removed=state.periods.splice(idx,1)[0];save();closeSheet();render();
+    toast("Regla eliminada","Deshacer",()=>{state.periods.push(removed);save();render()});
+  })}
+  const c=root.querySelector("#fCancel");if(c)c.addEventListener("click",()=>{closeSheet();calSel=null;render()});
+}
+function openEdit(id){
+  const p=state.periods.find(q=>q.id===id);if(!p)return;
+  openSheet(periodForm(p,"Editar regla"),root=>bindForm(root,p,false));
+}
+function openNew(start,end){
+  const p={start:start||toS(todayN()),end:end||null,moods:[],note:""};
+  openSheet(periodForm(p,"Nueva regla"),root=>bindForm(root,p,true));
+}
+function openEndOther(m){
+  openSheet(`<h3 id="sheetTitle">¿Qué día terminó?</h3>
+  <div class="field"><label for="eDate">Último día de sangrado</label><input type="date" id="eDate" value="${toS(todayN())}" min="${m.last.start}" max="${toS(todayN())}"></div>
+  <div id="fErr" class="msg err" hidden></div>
+  <button class="btn" type="button" id="eSave">Guardar</button>`,root=>{
+    root.querySelector("#eSave").addEventListener("click",()=>{
+      const v=root.querySelector("#eDate").value;const e=root.querySelector("#fErr");
+      if(!v||v<m.last.start||toN(v)>todayN()){e.textContent="Elige un día entre el inicio de la regla y hoy.";e.hidden=false;return}
+      const q=state.periods.find(q=>q.id===m.last.id);q.end=v;save();closeSheet();render();toast("Fin de regla guardado");
+    });
+  });
+}
+function openClear(fromBanner){
+  openSheet(`<h3 id="sheetTitle">${fromBanner?"Empezar con tus datos":"Borrar todos los datos"}</h3>
+  <p class="muted" style="margin:0">${fromBanner?"Se quitarán los datos de ejemplo. Después podrás importar tu CSV o añadir reglas desde el calendario.":"Se borrarán todas las reglas, notas y ánimos guardados en este navegador. No se puede deshacer; exporta una copia antes si la quieres."}</p>
+  <button class="btn" type="button" id="cYes">${fromBanner?"Quitar el ejemplo":"Sí, borrar todo"}</button>
+  <button class="btn ghost" type="button" id="cNo">Cancelar</button>`,root=>{
+    root.querySelector("#cYes").addEventListener("click",()=>{state={periods:[],settings:state.settings,demo:false};save();closeSheet();tab=fromBanner?"datos":"hoy";render();toast(fromBanner?"Listo, añade tus reglas":"Datos borrados")});
+    root.querySelector("#cNo").addEventListener("click",closeSheet);
+  });
+}
+
+/* ---------- Aviso ---------- */
+let toastT=null;
+function toast(msg,act,fn){
+  $("toastMsg").textContent=msg;const b=$("toastAct");
+  if(act){b.hidden=false;b.textContent=act;b.onclick=()=>{fn();$("toast").classList.remove("show")}}else b.hidden=true;
+  $("toast").classList.add("show");clearTimeout(toastT);toastT=setTimeout(()=>$("toast").classList.remove("show"),act?6000:2600);
+}
+
+/* ---------- Eventos de cada vista ---------- */
+function bind(m){
+  const v=$("view");
+  v.querySelectorAll("[data-goto]").forEach(b=>b.addEventListener("click",()=>{tab=b.dataset.goto;render()}));
+  v.querySelectorAll("[data-edit]").forEach(b=>b.addEventListener("click",()=>openEdit(b.dataset.edit)));
+  v.querySelectorAll("[data-luteal]").forEach(b=>b.addEventListener("click",()=>{state.settings.luteal=+b.dataset.luteal;save();render()}));
+  v.querySelectorAll("[data-cal]").forEach(b=>b.addEventListener("click",()=>{const d=D(calMonth);calMonth=Math.round(Date.UTC(d.getUTCFullYear(),d.getUTCMonth()+Number(b.dataset.cal),1)/DAY);render()}));
+  v.querySelectorAll("[data-day]").forEach(b=>b.addEventListener("click",()=>{
+    const n=+b.dataset.day;
+    if(calSel){
+      if(calSel.b==null&&n!==calSel.a){calSel.b=n;if(calSel.b<calSel.a){const t=calSel.a;calSel.a=calSel.b;calSel.b=t}}
+      else calSel={a:n,b:null};
+      render();return;
+    }
+    const p=m&&m.P.find(p=>n>=p.s&&n<=(p.e!=null?p.e:(p===m.last?Math.max(m.lastEnd,m.active?m.today:m.lastEnd):p.s+4)));
+    if(p){openEdit(p.id);return}
+    if(n>todayN()){toast("No se pueden añadir reglas futuras");return}
+    calSel={a:n,b:null};render();
+  }));
+  v.querySelectorAll("[data-act]").forEach(b=>b.addEventListener("click",()=>{
+    const a=b.dataset.act;
+    if(a==="startToday"){
+      const t=toS(todayN());
+      if(state.periods.some(p=>p.start===t)){toast("Ya hay una regla que empieza hoy");return}
+      if(m&&m.active){toast("Ya hay una regla en curso");return}
+      const np={id:uid(),start:t,end:null,moods:[],note:""};
+      if(m&&m.last.e==null){const q=state.periods.find(q=>q.id===m.last.id);if(q)q.end=toS(m.lastEnd)}
+      state.periods.push(np);save();render();
+      toast("Regla registrada: hoy es el día 1","Añadir ánimo",()=>openEdit(np.id));
+    }
+    else if(a==="startOther")openNew(toS(todayN()-1),null);
+    else if(a==="endToday"){const q=state.periods.find(q=>q.id===m.last.id);q.end=toS(todayN());save();render();toast("Fin de regla guardado","Deshacer",()=>{q.end=null;save();render()})}
+    else if(a==="endOther")openEndOther(m);
+    else if(a==="calAdd"){calSel={a:todayN(),b:null};const d=D(todayN());calMonth=Math.round(Date.UTC(d.getUTCFullYear(),d.getUTCMonth(),1)/DAY);render()}
+    else if(a==="calToday"){calMonth=null;render()}
+    else if(a==="calCancel"){calSel=null;render()}
+    else if(a==="calNext"){const s=calSel.a,e=calSel.b;openNew(toS(s),e!=null?toS(e):null)}
+    else if(a==="import"){
+      const f=$("csvFile").files[0];const txt=$("csvText").value;
+      if(f){const r=new FileReader();r.onload=()=>doImport(String(r.result));r.onerror=()=>{importMsg={cls:"err",html:"No se pudo leer el archivo."};render()};r.readAsText(f)}
+      else if(txt.trim())doImport(txt);
+      else{importMsg={cls:"err",html:"Elige un archivo o pega el contenido del CSV."};render()}
+    }
+    else if(a==="exportShow"){$("exportBox").hidden=false;$("exportText").value=toCSV()}
+    else if(a==="copy"){const ta=$("exportText");const done=()=>toast("CSV copiado");try{navigator.clipboard.writeText(ta.value).then(done,()=>{ta.select();$("exportNote").textContent="Texto seleccionado: cópialo con el menú del móvil."})}catch(e){ta.select();$("exportNote").textContent="Texto seleccionado: cópialo con el menú del móvil."}}
+    else if(a==="download"){try{const blob=new Blob(["﻿"+toCSV()],{type:"text/csv"});const u=URL.createObjectURL(blob);const l=document.createElement("a");l.href=u;l.download="luna-reglas-"+toS(todayN())+".csv";document.body.appendChild(l);l.click();l.remove();setTimeout(()=>URL.revokeObjectURL(u),2000);$("exportNote").textContent="Si no se descarga nada, usa «Copiar» y pégalo en una nota o un correo."}catch(e){$("exportNote").textContent="Este navegador no permite descargar aquí. Usa «Copiar»."}}
+    else if(a==="loadDemo"){state={periods:demoData(),settings:state.settings,demo:true};save();tab="hoy";render()}
+    else if(a==="clearAll")openClear(false);
+    else if(a==="toggleAll"){showAll=!showAll;render()}
+  }));
+}
+
+render();
+window.__luna={computeModel,parseCSV,predictLen,backtest,buildCycles};
+if("serviceWorker" in navigator&&(location.protocol==="https:"||location.hostname==="localhost")){window.addEventListener("load",()=>navigator.serviceWorker.register("sw.js").catch(()=>{}))}
+})();
+</script>
+
+</body>
+</html>
