@@ -25,6 +25,7 @@
   --period:#f08cb8; --period-ink:#2a0f22; --period-soft:rgba(240,140,184,.18);
   --fertile:#8f7cf0; --fertile-soft:rgba(143,124,240,.34); --ovu:#c9bbff;
   --pms:#f5c26b; --pms-soft:rgba(245,194,107,.16); --ok:#7fd4b0;
+  --m-joy:#f6cf45; --m-sad:#5aa2f5; --m-ira:#ef4b4b; --m-fear:#b45ff0; --m-anx:#f58a2e; --m-calm:#9aa1b4;
   --shadow:0 18px 40px -24px rgba(0,0,0,.7);
   --f-display:"Fraunces",Georgia,"Times New Roman",serif;
   --f-ui:"Figtree",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
@@ -36,6 +37,7 @@
   --period:#d6457d; --period-ink:#ffffff; --period-soft:rgba(214,69,125,.13);
   --fertile:#6a55e0; --fertile-soft:rgba(106,85,224,.14); --ovu:#3f2fb0;
   --pms:#b7791f; --pms-soft:rgba(183,121,31,.12); --ok:#1f8a63;
+  --m-joy:#d9a400; --m-sad:#2f7fe0; --m-ira:#d92d2d; --m-fear:#9440d6; --m-anx:#e06d10; --m-calm:#7c8396;
   --shadow:0 14px 32px -22px rgba(40,30,90,.35); color-scheme:light}}
 :root[data-theme="light"]{
   --bg:#f4f2fb; --surface:#ffffff; --surface2:#ebe7fa; --line:#dcd6f1;
@@ -43,6 +45,7 @@
   --period:#d6457d; --period-ink:#ffffff; --period-soft:rgba(214,69,125,.13);
   --fertile:#6a55e0; --fertile-soft:rgba(106,85,224,.14); --ovu:#3f2fb0;
   --pms:#b7791f; --pms-soft:rgba(183,121,31,.12); --ok:#1f8a63;
+  --m-joy:#d9a400; --m-sad:#2f7fe0; --m-ira:#d92d2d; --m-fear:#9440d6; --m-anx:#e06d10; --m-calm:#7c8396;
   --shadow:0 14px 32px -22px rgba(40,30,90,.35); color-scheme:light}
 
 *{box-sizing:border-box}
@@ -94,6 +97,10 @@ h1,h2,h3{margin:0;text-wrap:balance}
 .linkbtn{background:none;border:0;color:var(--muted);text-decoration:underline;text-underline-offset:3px;padding:6px;font-size:.88rem;justify-self:center}
 .legend{display:flex;flex-wrap:wrap;gap:6px 14px;font-size:.78rem;color:var(--muted)}
 .legend em{font-style:normal;display:inline-flex;align-items:center;gap:6px}
+.legend em.symk::before{display:none}
+.legend em.mk::before{border-radius:50%}
+.legend em.symk svg{width:11px;height:11px;color:var(--fg)}
+.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}
 .legend em::before{content:"";width:10px;height:10px;border-radius:3px;background:var(--k);border:var(--b,0)}
 
 /* Calendario */
@@ -103,19 +110,47 @@ h1,h2,h3{margin:0;text-wrap:balance}
 .iconbtn svg{width:18px;height:18px}
 .grid{display:grid;grid-template-columns:repeat(7,1fr);gap:4px;text-align:center}
 .grid .dow{font-size:.72rem;color:var(--muted);padding:4px 0;text-transform:uppercase;letter-spacing:.05em}
-.day{position:relative;aspect-ratio:1;border:0;background:transparent;border-radius:12px;display:grid;place-items:center;font-size:.95rem;padding:0;min-width:0}
+.day{position:relative;min-height:54px;border:0;background:transparent;border-radius:12px;display:flex;flex-direction:column;align-items:center;justify-content:flex-start;gap:4px;font-size:.95rem;padding:7px 0 4px;min-width:0}
 .day.out{visibility:hidden}
 .day.past{color:var(--fg)}
 .day.fert{background:var(--fertile-soft)}
 .day.pms{background:var(--pms-soft)}
-.day.ovu::after{content:"";position:absolute;inset:5px;border-radius:50%;border:2px solid var(--fertile)}
+.day.ovu .num{box-shadow:0 0 0 2px var(--fertile);border-radius:50%}
+.day .num{display:grid;place-items:center;min-width:24px;height:24px;line-height:1}
 .day.pred{box-shadow:inset 0 0 0 2px var(--period);background:var(--period-soft)}
 .day.per{background:var(--period);color:var(--period-ink);font-weight:700}
 .day.today{font-weight:800;box-shadow:inset 0 0 0 2px var(--fg)}
-.day.today::before{content:"";position:absolute;bottom:5px;width:5px;height:5px;border-radius:50%;background:currentColor}
 .day.sel{background:var(--fg);color:var(--bg);font-weight:700}
 .day.selr{background:color-mix(in srgb,var(--fg) 25%,transparent)}
-.day.note-dot .nd{position:absolute;top:5px;right:6px;width:5px;height:5px;border-radius:50%;background:var(--ovu)}
+.mdots{display:flex;flex-wrap:wrap;justify-content:center;gap:2px;max-width:24px}
+.mdots i{width:6px;height:6px;border-radius:50%;background:var(--k);box-shadow:0 0 0 1px var(--surface)}
+.day.per .mdots i{box-shadow:0 0 0 1.5px var(--period)}
+.day.sel .mdots i{box-shadow:0 0 0 1.5px var(--fg)}
+.day .sy{position:absolute;top:3px;width:11px;height:11px;color:var(--fg)}
+.day .sy.l{left:3px}.day .sy.r{right:3px}
+.day.per .sy{color:var(--period-ink)}.day.sel .sy{color:var(--bg)}
+.day .nc{position:absolute;bottom:3px;right:4px;width:0;height:0;border-left:6px solid transparent;border-bottom:6px solid var(--muted)}
+.day.per .nc{border-bottom-color:var(--period-ink)}
+.chip.mood{display:inline-flex;align-items:center;gap:7px;padding:7px 12px 7px 10px}
+.chip.mood .d{width:11px;height:11px;border-radius:50%;background:var(--k)}
+.chip.mood[aria-pressed="true"]{background:color-mix(in srgb,var(--k) 24%,var(--surface2));border-color:var(--k);color:var(--fg);box-shadow:inset 0 0 0 1px var(--k)}
+.chip.sym{display:inline-flex;align-items:center;gap:7px}
+.chip.sym svg{width:15px;height:15px}
+.chip.sym[aria-pressed="true"]{background:color-mix(in srgb,var(--fg) 14%,var(--surface2));border-color:var(--fg);color:var(--fg)}
+.moodset{display:grid;gap:10px}
+.moodset .sep{height:1px;background:var(--line)}
+.saved{font-size:.78rem;color:var(--muted);margin:0;min-height:1.2em}
+.phasegrid{overflow-x:auto}
+.phasegrid table{width:100%;border-collapse:separate;border-spacing:3px;font-size:.78rem;min-width:300px}
+.phasegrid th{font-weight:600;color:var(--muted);text-align:center;padding:2px}
+.phasegrid th.rl{text-align:left}
+.phasegrid td{text-align:center;border-radius:6px;padding:6px 2px;font-variant-numeric:tabular-nums}
+.phasegrid td.lab{text-align:left;padding-left:0;white-space:nowrap}
+.phasegrid td.lab span{display:inline-flex;align-items:center;gap:6px}
+.phasegrid td.lab i{width:9px;height:9px;border-radius:50%;background:var(--k);display:inline-block}
+.phasegrid td.lab svg{width:12px;height:12px}
+.insight{background:var(--surface2);border-radius:12px;padding:10px 12px;font-size:.9rem;display:flex;gap:10px;align-items:flex-start}
+.insight i{flex:none;width:10px;height:10px;border-radius:50%;margin-top:6px;background:var(--k)}
 .hint{font-size:.88rem;color:var(--muted);text-align:center;margin:0}
 .addbar{display:flex;gap:10px}
 .addbar .btn{flex:1}
@@ -231,6 +266,10 @@ pre.fmt{background:var(--surface2);border-radius:12px;padding:10px 12px;overflow
 @media (prefers-reduced-motion: reduce){*{transition:none!important;animation:none!important}}
 </style>
 
+<svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false">
+  <symbol id="i-dolor" viewBox="0 0 24 24"><polygon points="12.0,1.5 13.8,7.8 19.4,4.6 16.2,10.2 22.5,12.0 16.2,13.8 19.4,19.4 13.8,16.2 12.0,22.5 10.2,16.2 4.6,19.4 7.8,13.8 1.5,12.0 7.8,10.2 4.6,4.6 10.2,7.8" fill="currentColor"/></symbol>
+  <symbol id="i-cans" viewBox="0 0 24 24"><path d="M3.5 6.5h7l-7 9h7M13 3h7l-7 9h7" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+</svg>
 <div class="app" id="app">
   <div class="topbar">
     <div class="brand"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15.5 3.2A9 9 0 1 0 20.8 15 7.2 7.2 0 0 1 15.5 3.2Z" fill="var(--period)"/></svg>Luna</div>
@@ -274,32 +313,84 @@ const fmtRange=(a,b)=>{const da=D(a),db=D(b);return da.getUTCMonth()===db.getUTC
 const esc=s=>String(s==null?"":s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
 const plural=(n,a,b)=>n+" "+(Math.abs(n)===1?a:b);
 
-const MOODS=["Bien","Tranquila","Con energía","Cansada","Sensible","Irritable","Triste","Ansiosa","Con dolor"];
+const MOODS=[
+  {k:"alegria",label:"Alegría",full:"Alegría / Energía",c:"var(--m-joy)"},
+  {k:"tristeza",label:"Tristeza",full:"Tristeza / Sensible",c:"var(--m-sad)"},
+  {k:"ira",label:"Ira",full:"Ira / Irritabilidad",c:"var(--m-ira)"},
+  {k:"miedo",label:"Miedo",full:"Miedo",c:"var(--m-fear)"},
+  {k:"ansiedad",label:"Ansiedad",full:"Ansiedad",c:"var(--m-anx)"},
+  {k:"tranquila",label:"Tranquila",full:"Tranquila",c:"var(--m-calm)"}];
+const SYMS=[{k:"dolor",label:"Dolor",icon:"i-dolor"},{k:"cansancio",label:"Cansancio",icon:"i-cans"}];
+const ALLK=MOODS.map(x=>x.k).concat(SYMS.map(x=>x.k));
+const iconSVG=(id,cls)=>`<svg class="${cls||""}" aria-hidden="true"><use href="#${id}"/></svg>`;
+const norm=t=>String(t||"").toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g,"").trim();
+const ALIAS={alegria:"alegria",energia:"alegria","con energia":"alegria",bien:"alegria",feliz:"alegria",tristeza:"tristeza",triste:"tristeza",sensible:"tristeza",ira:"ira",irritable:"ira",irritabilidad:"ira",enfado:"ira",miedo:"miedo",ansiedad:"ansiosa",ansiosa:"ansiedad",tranquila:"tranquila",tranquilidad:"tranquila",calma:"tranquila",dolor:"dolor","con dolor":"dolor",cansancio:"cansancio",cansada:"cansancio"};
+ALIAS.ansiedad="ansiedad";
+function moodKey(t){const n=norm(t);if(ALLK.includes(n))return n;if(ALIAS[n])return ALIAS[n];const first=n.split("/")[0].trim();return ALIAS[first]||null}
+function moodLabel(k){const m=MOODS.find(x=>x.k===k)||SYMS.find(x=>x.k===k);return m?m.label:k}
 const LS_KEY="luna-ciclo-v1";
 
 /* ---------- Estado ---------- */
 let state=load();
 function load(){
-  try{const raw=localStorage.getItem(LS_KEY);if(raw){const s=JSON.parse(raw);if(s&&Array.isArray(s.periods)){s.settings=Object.assign({luteal:14},s.settings||{});return s}}}catch(e){}
-  return {periods:demoData(),settings:{luteal:14},demo:true};
+  try{const raw=localStorage.getItem(LS_KEY);if(raw){const s=JSON.parse(raw);if(s&&Array.isArray(s.periods)){s.settings=Object.assign({luteal:14},s.settings||{});return migrate(s)}}}catch(e){}
+  const d=demoData();return {periods:d.periods,days:d.days,settings:{luteal:14},demo:true};
+}
+// Versión 3: el ánimo y la nota pasan de cada regla a cada día (lo antiguo va al primer día de la regla)
+function migrate(s){
+  if(!s.days||typeof s.days!=="object")s.days={};
+  for(const p of s.periods){
+    if((p.moods&&p.moods.length)||p.note)mergeDay(s.days,p.start,p.moods||[],p.note||"");
+    delete p.moods;delete p.note;
+  }
+  return s;
+}
+function mergeDay(days,date,moods,note){
+  const ks=[];for(const t of moods){const k=moodKey(t);if(k&&!ks.includes(k))ks.push(k)}
+  const d=days[date]||{m:[],note:""};
+  for(const k of ks)if(!d.m.includes(k))d.m.push(k);
+  if(note)d.note=d.note?(d.note.includes(note)?d.note:d.note+" · "+note):note;
+  if(d.m.length||d.note)days[date]=d;
+  return ks.length+(note?1:0)>0;
+}
+function getDay(date){return (state.days&&state.days[date])||{m:[],note:""}}
+function setDay(date,m,note){
+  if(!state.days)state.days={};
+  if(m.length||note)state.days[date]={m:ALLK.filter(k=>m.includes(k)),note};else delete state.days[date];
+  save();
 }
 function save(){try{localStorage.setItem(LS_KEY,JSON.stringify(state))}catch(e){}}
+if(!state.demo)save(); // deja guardada la migración a ánimo por día
 function uid(){return Math.random().toString(36).slice(2,10)}
 
 function demoData(){
   // Ejemplo reproducible: ciclos de 27 a 32 días, algo más largos en invierno, que acaba con un ciclo empezado hace 12 días
   let seed=7;const rnd=()=>{seed=(seed*16807)%2147483647;return seed/2147483647};
   const out=[];let s=todayN()-12;
-  const notes=["","","Semana de exámenes","","Viaje a Valencia","","","Mucho estrés en el trabajo","",""];
   for(let i=0;i<44;i++){
     const m=D(s).getUTCMonth();const winter=(m===11||m<=1)?1:0;
     const pl=4+Math.round(rnd()*2);
-    const moods=[];if(rnd()<.55)moods.push(MOODS[Math.floor(rnd()*MOODS.length)]);if(rnd()<.25)moods.push("Con dolor");
-    out.push({id:uid(),start:toS(s),end:toS(s+pl-1),moods:[...new Set(moods)],note:notes[i%notes.length]});
+    out.push({id:uid(),start:toS(s),end:toS(s+pl-1)});
     s-= 28+winter+Math.round((rnd()-.5)*3.2);
   }
   out[0].end=toS(todayN()-12+4);
-  return out.reverse();
+  out.reverse();
+  // Ánimo de ejemplo en los últimos 5 meses, con más irritabilidad y tristeza antes de la regla y dolor en la regla
+  const days={};const notes=["Semana de exámenes","Viaje a Valencia","Mucho estrés en el trabajo","Cena con amigas","Discusión en casa"];
+  const starts=out.map(p=>toN(p.start));
+  for(let n=todayN()-150;n<=todayN();n++){
+    if(rnd()>.55)continue;
+    const st=starts.filter(x=>x<=n).pop();const nx=starts.find(x=>x>n)||st+29;const dc=n-st+1,toNext=nx-n;
+    const mm=[];
+    if(dc<=5){if(rnd()<.6)mm.push("dolor");if(rnd()<.5)mm.push("cansancio");if(rnd()<.35)mm.push("tristeza")}
+    else if(toNext<=5){if(rnd()<.5)mm.push("ira");if(rnd()<.45)mm.push("tristeza");if(rnd()<.3)mm.push("ansiedad");if(rnd()<.3)mm.push("cansancio")}
+    else if(dc>=9&&dc<=16){if(rnd()<.6)mm.push("alegria");if(rnd()<.3)mm.push("tranquila")}
+    else{const pick=["tranquila","alegria","ansiedad","miedo","tranquila","cansancio"][Math.floor(rnd()*6)];mm.push(pick)}
+    if(!mm.length)mm.push("tranquila");
+    const note=rnd()<.08?notes[Math.floor(rnd()*notes.length)]:"";
+    days[toS(n)]={m:ALLK.filter(k=>mm.includes(k)),note};
+  }
+  return {periods:out,days};
 }
 
 /* ---------- Modelo de ciclo y predicción ---------- */
@@ -376,6 +467,41 @@ function phaseFor(m,n){
   if(n<m.fertA)return "folicular";
   if(n>=m.nextStart)return "pms";
   return "lutea";
+}
+
+// Fase de cualquier día (pasado o futuro) según la regla anterior y la siguiente, real o prevista
+function phaseOfDay(m,n){
+  if(!m)return null;const P=m.P;let i=-1;
+  for(let j=0;j<P.length;j++){if(P[j].s<=n)i=j;else break}
+  if(i<0)return null;
+  const p=P[i];const pend=p.e!=null?p.e:(p===m.last?(m.active?Math.max(m.lastEnd,m.today):m.lastEnd):p.s+m.plen-1);
+  const dc=n-p.s+1;
+  if(n<=pend)return {k:"regla",dc};
+  const next=i+1<P.length?P[i+1].s:m.nextStart;
+  if(n>=next)return {k:"retraso",dc};
+  const ov=next-m.luteal;
+  if(n===ov)return {k:"ovulacion",dc};
+  if(n>=ov-5&&n<ov)return {k:"fertil",dc};
+  if(n>=next-5)return {k:"pms",dc};
+  if(n<ov-5)return {k:"folicular",dc};
+  return {k:"lutea",dc};
+}
+function moodPicker(sel,idp){
+  return `<div class="moodset">
+    <div class="chips" role="group" aria-label="Ánimo">${MOODS.map(x=>`<button type="button" class="chip mood" style="--k:${x.c}" aria-pressed="${sel.includes(x.k)}" data-mk="${x.k}" title="${esc(x.full)}"><span class="d"></span>${esc(x.label)}</button>`).join("")}</div>
+    <div class="sep"></div>
+    <div class="chips" role="group" aria-label="Síntomas">${SYMS.map(x=>`<button type="button" class="chip sym" aria-pressed="${sel.includes(x.k)}" data-mk="${x.k}">${iconSVG(x.icon)}${esc(x.label)}</button>`).join("")}</div>
+  </div>`;
+}
+function dayMarks(d,n){
+  if(!d||(!d.m.length&&!d.note))return "";
+  let h="";
+  if(d.m.includes("dolor"))h+=iconSVG("i-dolor","sy l");
+  if(d.m.includes("cansancio"))h+=iconSVG("i-cans","sy r");
+  const dots=MOODS.filter(x=>d.m.includes(x.k));
+  if(dots.length)h+=`<span class="mdots">${dots.map(x=>`<i style="--k:${x.c}"></i>`).join("")}</span>`;
+  if(d.note)h+=`<span class="nc"></span>`;
+  return h;
 }
 
 /* ---------- Navegación ---------- */
@@ -476,6 +602,7 @@ function viewHoy(m){
       ?`<button class="btn" type="button" data-act="endToday">Ha terminado hoy</button><button class="linkbtn" type="button" data-act="endOther">Terminó otro día</button>`
       :`<button class="btn" type="button" data-act="startToday">Me ha venido hoy</button><button class="linkbtn" type="button" data-act="startOther">Me vino otro día</button>`}
   </div>
+  ${todayCard()}
   <section class="card">
     <div class="row2">
       <div class="kv"><small>Ventana fértil</small><strong style="font-size:1.05rem">${fertTxt}</strong><span>Ovulación hacia el ${fmt(m.ov)}</span></div>
@@ -487,8 +614,16 @@ function viewHoy(m){
     <p class="phase-text">${P.txt}</p>
     <div class="legend"><em style="--k:var(--period)">Regla</em><em style="--k:var(--fertile)">Fértil</em><em style="--k:var(--ovu)">Ovulación</em><em style="--k:var(--pms)">Premenstrual</em></div>
   </section>
-  ${m.active?`<button class="linkbtn" type="button" data-edit="${m.last.id}">Añadir ánimo o nota a esta regla</button>`:""}
   <p class="small-print">Estimaciones orientativas a partir de tus fechas. No sirven como método anticonceptivo.</p>`;
+}
+function todayCard(){
+  const t=toS(todayN());const d=getDay(t);
+  return `<section class="card" id="todayMood" data-date="${t}">
+    <h2>¿Cómo estás hoy?</h2>
+    ${moodPicker(d.m)}
+    <div class="field"><label for="todayNote" class="sr">Nota de hoy</label><textarea id="todayNote" placeholder="Añade una nota sobre hoy (opcional)">${esc(d.note)}</textarea></div>
+    <p class="saved" id="todaySaved">${d.m.length||d.note?"Guardado. Puedes cambiarlo durante todo el día.":"Toca para marcar. Se guarda solo."}</p>
+  </section>`;
 }
 function emptyView(){
   return `<div class="empty">
@@ -534,11 +669,12 @@ function viewCal(m){
       if(m.active&&!per){for(const p of proj){if(n>=p.S&&n<p.S+m.plen){cls.push("pred");break}}}
     }
     if(n===t){cls.push("today");label+=", hoy"}
-    if(calSel){const a=calSel.a,b=calSel.b==null?a:calSel.b;if(n===a||n===b)cls.push("sel");else if(n>Math.min(a,b)&&n<Math.max(a,b))cls.push("selr")}
-    const hasNote=per&&(per.note||(per.moods&&per.moods.length))&&n===per.s;
-    cells+=`<button type="button" class="${cls.join(" ")}${hasNote?" note-dot":""}" data-day="${n}" aria-label="${esc(label)}">${i}${hasNote?'<span class="nd"></span>':""}</button>`;
+    if(calSel&&calSel.a!=null){const a=calSel.a,b=calSel.b==null?a:calSel.b;if(n===a||n===b)cls.push("sel");else if(n>Math.min(a,b)&&n<Math.max(a,b))cls.push("selr")}
+    const dd=state.days&&state.days[toS(n)];
+    if(dd){const ws=dd.m.map(moodLabel);if(ws.length)label+=", "+ws.join(", ");if(dd.note)label+=", con nota"}
+    cells+=`<button type="button" class="${cls.join(" ")}" data-day="${n}" aria-label="${esc(label)}"><span class="num">${i}</span>${dayMarks(dd,n)}</button>`;
   }
-  const hint=calSel?(calSel.b==null?"Ahora toca el último día de sangrado, o guarda si aún no ha terminado.":"Comprueba las fechas y pulsa Siguiente."):"Toca un día de regla para editarla, o cualquier otro día para añadir una. Desliza el calendario para cambiar de mes.";
+  const hint=calSel?(calSel.a==null?"Toca el primer día de la regla.":calSel.b==null?"Ahora toca el último día de sangrado, o pulsa Siguiente si aún no ha terminado.":"Comprueba las fechas y pulsa Siguiente."):"Toca un día para anotar ánimo y nota. Desliza el calendario para cambiar de mes.";
   return `
   <div class="calhead">
     <button class="iconbtn" type="button" data-cal="-1" aria-label="Mes anterior"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M15 5l-7 7 7 7"/></svg></button>
@@ -548,7 +684,8 @@ function viewCal(m){
   <section class="card calcard" id="calcard"><div class="grid">${cells}</div></section>
   <p class="hint">${hint}</p>
   ${calSel?`<div class="addbar"><button class="btn ghost" type="button" data-act="calCancel">Cancelar</button><button class="btn" type="button" data-act="calNext">Siguiente</button></div>`:`<div class="addbar"><button class="btn ghost" type="button" data-act="calToday">Ir a hoy</button><button class="btn violet" type="button" data-act="calAdd">Añadir regla</button></div>`}
-  <div class="legend" style="justify-content:center"><em style="--k:var(--period)">Regla</em><em style="--k:var(--period-soft);--b:2px solid var(--period)">Prevista</em><em style="--k:var(--fertile-soft)">Fértil</em><em style="--k:transparent;--b:2px solid var(--fertile)">Ovulación</em><em style="--k:var(--pms-soft)">Premenstrual</em></div>`;
+  <div class="legend" style="justify-content:center"><em style="--k:var(--period)">Regla</em><em style="--k:var(--period-soft);--b:2px solid var(--period)">Prevista</em><em style="--k:var(--fertile-soft)">Fértil</em><em style="--k:transparent;--b:2px solid var(--fertile)">Ovulación</em><em style="--k:var(--pms-soft)">Premenstrual</em></div>
+  <div class="legend" style="justify-content:center">${MOODS.map(x=>`<em class="mk" style="--k:${x.c}">${esc(x.label)}</em>`).join("")}<em class="symk">${iconSVG("i-dolor")}Dolor</em><em class="symk">${iconSVG("i-cans")}Cansancio</em></div>`;
 }
 
 /* ---------- Estadísticas ---------- */
@@ -579,9 +716,7 @@ function viewStats(m){
   const present=mavg.filter(x=>x!=null);const lo=Math.min(...present,26)-2,hi=Math.max(...present,31);
   let months="";mavg.forEach((v,i)=>{months+=`<div class="m">${v!=null?`<b>${v.toFixed(0)}</b><i style="height:${((v-lo)/(hi-lo)*70+8).toFixed(0)}px"></i>`:`<b class="muted">·</b><i class="none"></i>`}<small>${MES[i].slice(0,1).toUpperCase()}</small></div>`});
   // ánimo
-  const counts={};m.P.forEach(p=>(p.moods||[]).forEach(x=>counts[x]=(counts[x]||0)+1));
-  const ms=Object.entries(counts).sort((a,b)=>b[1]-a[1]);const mmax=ms.length?ms[0][1]:1;
-  const withMood=m.P.filter(p=>p.moods&&p.moods.length).length;
+  const moodHTML=moodStats(m);
   const bt=m.bt;
   const seaTxt=m.pred&&m.pred.E!=null?`Ahora mismo: lo reciente apunta a ${m.pred.R.toFixed(1)} días y la misma época de años anteriores a ${m.pred.E.toFixed(1)} (${m.pred.nSea} ciclos).`:"Aún no hay ciclos de la misma época en años anteriores, así que solo cuenta lo reciente.";
   return `
@@ -609,9 +744,61 @@ function viewStats(m){
     <p style="margin:0">La mejor combinación para ti: <b>${Math.round(m.alpha*100)} %</b> ciclos recientes y <b>${Math.round((1-m.alpha)*100)} %</b> misma época de años anteriores.</p>`:`<p style="margin:0">Con más de 7 ciclos registrados, Luna comprobará qué combinación de ciclos recientes y misma época del año acierta más contigo.</p>`}
     <p class="small-print" style="margin:0">${seaTxt}</p>
   </section>
-  <section class="card">
+  ${moodHTML}`;
+}
+const PH_COLS=[["regla","Regla"],["folicular","Folic."],["fertil","Fértil"],["lutea","Lútea"],["pms","Premen."]];
+const PH_NAMES={regla:"la regla",folicular:"la fase folicular",fertil:"la ventana fértil",lutea:"la fase lútea",pms:"los días premenstruales"};
+function moodStats(m){
+  const entries=Object.entries(state.days||{}).filter(([d,v])=>v.m&&v.m.length);
+  if(!entries.length)return `<section class="card"><h2>Ánimo</h2><p class="muted" style="margin:0">Aún no has marcado el ánimo de ningún día. Hazlo desde Hoy o tocando un día del calendario.</p></section>`;
+  const total={},byPh={},nPh={};
+  for(const [d,v] of entries){
+    const ph=phaseOfDay(m,toN(d));let k=ph?ph.k:null;if(k==="ovulacion")k="fertil";
+    for(const x of v.m)total[x]=(total[x]||0)+1;
+    if(!k||k==="retraso")continue;
+    nPh[k]=(nPh[k]||0)+1;byPh[k]=byPh[k]||{};
+    for(const x of v.m)byPh[k][x]=(byPh[k][x]||0)+1;
+  }
+  const N=entries.length;
+  const items=MOODS.map(x=>({k:x.k,label:x.label,c:x.c,dot:true})).concat(SYMS.map(x=>({k:x.k,label:x.label,icon:x.icon})));
+  const tmax=Math.max(1,...items.map(x=>total[x.k]||0));
+  const bars=items.map(x=>`<div class="moodbar"><span style="display:inline-flex;align-items:center;gap:6px">${x.dot?`<i style="width:9px;height:9px;border-radius:50%;background:${x.c};display:inline-block"></i>`:iconSVG(x.icon,"")}${esc(x.label)}</span><span class="track"><i style="width:${((total[x.k]||0)/tmax*100).toFixed(0)}%;background:${x.c||"var(--ovu)"}"></i></span><b>${total[x.k]||0}</b></div>`).join("");
+  // tabla por fase: % de los días anotados en esa fase que llevan cada ánimo
+  let rows="";
+  for(const x of items){
+    rows+=`<tr><td class="lab"><span>${x.dot?`<i style="--k:${x.c}"></i>`:iconSVG(x.icon,"")}${esc(x.label)}</span></td>`;
+    for(const [pk] of PH_COLS){
+      const n=nPh[pk]||0,c=(byPh[pk]&&byPh[pk][x.k])||0;const pc=n?Math.round(c/n*100):null;
+      const col=x.c||"var(--fg)";
+      rows+=pc==null?`<td class="muted">–</td>`:`<td style="background:color-mix(in srgb,${col} ${Math.round(pc*0.7)}%,var(--surface2));${pc>=45?"font-weight:700":""}">${pc}%</td>`;
+    }
+    rows+="</tr>";
+  }
+  // conclusiones: ánimos que se concentran claramente en una fase
+  const ins=[];
+  for(const x of items){
+    let best=null;
+    for(const [pk] of PH_COLS){
+      const n=nPh[pk]||0,c=(byPh[pk]&&byPh[pk][x.k])||0;if(n<5||c<3)continue;
+      const restN=N-n,restC=(total[x.k]||0)-c;const share=c/n,rest=restN>0?restC/restN:0;
+      const lift=share-rest;
+      if(lift>=0.15&&share>=0.3&&(!best||lift>best.lift))best={pk,share,rest,lift};
+    }
+    if(best)ins.push({x,...best});
+  }
+  ins.sort((a,b)=>b.lift-a.lift);
+  const insHTML=ins.slice(0,3).map(o=>`<div class="insight"><i style="--k:${o.x.c||"var(--fg)"}"></i><span><b>${esc(o.x.label)}</b> se concentra en ${PH_NAMES[o.pk]}: aparece en el ${Math.round(o.share*100)} % de esos días, frente al ${Math.round(o.rest*100)} % del resto.</span></div>`).join("");
+  return `<section class="card">
     <h2>Ánimo registrado</h2>
-    ${ms.length?`<div class="moodbars">${ms.map(([k,v])=>`<div class="moodbar"><span>${esc(k)}</span><span class="track"><i style="width:${(v/mmax*100).toFixed(0)}%"></i></span><b>${v}</b></div>`).join("")}</div><p class="small-print" style="margin:0">En ${withMood} de ${m.P.length} reglas registraste el ánimo.</p>`:`<p class="muted" style="margin:0">Aún no has marcado el ánimo en ninguna regla. Puedes hacerlo al registrarla o desde el calendario.</p>`}
+    <div class="moodbars">${bars}</div>
+    <p class="small-print" style="margin:0">${plural(N,"día anotado","días anotados")}.</p>
+  </section>
+  <section class="card">
+    <h2>Ánimo en cada fase</h2>
+    ${insHTML||`<p class="muted" style="margin:0;font-size:.9rem">Aún no hay ningún ánimo que destaque claramente en una fase. Con más días anotados aparecerán aquí las tendencias.</p>`}
+    <div class="phasegrid"><table><thead><tr><th class="rl"></th>${PH_COLS.map(([k,l])=>`<th>${l}</th>`).join("")}</tr></thead><tbody>${rows}</tbody>
+    <tfoot><tr><td class="lab muted">Días</td>${PH_COLS.map(([k])=>`<td class="muted">${nPh[k]||0}</td>`).join("")}</tr></tfoot></table></div>
+    <p class="small-print" style="margin:0">Porcentaje de los días anotados en cada fase que llevan ese ánimo. Las fases de días pasados se calculan con las reglas reales.</p>
   </section>`;
 }
 
@@ -621,13 +808,13 @@ function viewDatos(m){
   const P=m?m.P.slice().reverse():[];
   const lis=P.slice(0,showAll?P.length:12).map((p,i)=>{
     const next=P[i-1];const cyc=next?next.s-p.s:null;const len=p.e!=null?p.e-p.s+1:null;
-    const sub=[(p.moods||[]).join(", "),p.note].filter(Boolean).join(" · ");
+    const sub="";
     return `<li><button type="button" data-edit="${p.id}"><span class="d">${p.e!=null?(D(p.s).getUTCMonth()===D(p.e).getUTCMonth()?D(p.s).getUTCDate()+"–"+fmtY(p.e):fmt(p.s)+" – "+fmtY(p.e)):fmtY(p.s)+" · en curso"}</span><span class="len">${len?len+" d regla":""}${cyc?" · ciclo "+cyc:""}</span>${sub?`<span class="s">${esc(sub)}</span>`:""}</button></li>`;
   }).join("");
   return `
   <section class="card">
     <h2>Historial</h2>
-    <p class="muted" style="margin:0;font-size:.9rem">Toca una regla para cambiar fechas, ánimo o nota.</p>
+    <p class="muted" style="margin:0;font-size:.9rem">Toca una regla para cambiar sus fechas.</p>
     ${P.length?`<ul class="hist">${lis}</ul>${P.length>12?`<button class="linkbtn" type="button" data-act="toggleAll">${showAll?"Ver solo las últimas 12":"Ver las "+P.length+" reglas"}</button>`:""}`:`<p class="muted" style="margin:0">Sin reglas todavía.</p>`}
   </section>
   <section class="card">
@@ -635,9 +822,13 @@ function viewDatos(m){
     <p class="muted" style="margin:0;font-size:.9rem">Desde un archivo CSV o pegando el texto. Se ignoran las reglas que ya existan con la misma fecha de inicio.</p>
     <details><summary>Formato del CSV</summary>
       <pre class="fmt">inicio;fin;animo;nota
-2021-11-04;2021-11-08;Cansada;
-05/12/2021;09/12/2021;Bien|Con dolor;Viaje</pre>
-      <p class="small-print">Fechas como AAAA-MM-DD o DD/MM/AAAA. Separador punto y coma o coma. La fila de títulos es opcional. Solo «inicio» es obligatorio; varios ánimos se separan con «|».</p>
+2021-11-04;2021-11-08;;
+05/12/2021;09/12/2021;;
+
+fecha;animo;nota
+2026-10-21;Tristeza|Ira|Cansancio;
+2026-10-28;Alegría;Cena con amigas</pre>
+      <p class="small-print">Fechas como AAAA-MM-DD o DD/MM/AAAA. Separador punto y coma o coma. La fila de títulos es opcional. Solo «inicio» es obligatorio. La segunda tabla, con el ánimo y la nota de cada día, es opcional; varios ánimos se separan con «|». Ánimos válidos: Alegría, Tristeza, Ira, Miedo, Ansiedad, Tranquila, Dolor y Cansancio.</p>
     </details>
     <div class="field"><span class="lbl">Archivo</span><div class="filepick"><input type="file" id="csvFile" accept=".csv,.txt,text/csv,text/plain" tabindex="-1" aria-hidden="true"><button class="btn small ghost" type="button" data-act="pickFile">Elegir archivo</button><span id="csvName">Ningún archivo elegido</span></div></div>
     <div class="field"><label for="csvText">O pega aquí el contenido</label><textarea id="csvText" class="code" placeholder="inicio;fin;animo;nota"></textarea></div>
@@ -686,9 +877,20 @@ function parseCSV(text){
   const lines=text.replace(/^﻿/,"").split(/\r?\n/).filter(l=>l.trim());
   if(!lines.length)return {rows:[],errors:["El texto está vacío."]};
   const sep=(lines[0].split(";").length>=lines[0].split(",").length)?";":",";
-  const rows=[],errors=[];
+  const rows=[],errors=[],dayRows=[];let mode="reglas";
   lines.forEach((l,i)=>{
     const f=splitLine(l,sep);
+    const h=norm(f[0]);
+    if(h==="fecha"||h==="dia"){mode="dias";return}
+    if(h==="inicio"){mode="reglas";return}
+    if(mode==="dias"){
+      const dte=parseDate(f[0]);
+      if(!dte){errors.push(`Línea ${i+1}: no entiendo la fecha «${esc(f[0])}».`);return}
+      const moods=(f[1]||"").split("|").map(x=>x.trim()).filter(Boolean);
+      const unk=moods.filter(x=>!moodKey(x));if(unk.length)errors.push(`Línea ${i+1}: ánimo desconocido «${esc(unk.join(", "))}», se ignora.`);
+      dayRows.push({date:dte,moods,note:f.slice(2).join(sep==";"?"; ":", ").trim()});
+      return;
+    }
     const a=parseDate(f[0]);
     if(a===undefined){if(i===0)return;errors.push(`Línea ${i+1}: no entiendo la fecha «${esc(f[0])}».`);return}
     if(a===null){errors.push(`Línea ${i+1}: falta la fecha de inicio.`);return}
@@ -697,26 +899,35 @@ function parseCSV(text){
     if(b&&b<a){errors.push(`Línea ${i+1}: el fin es anterior al inicio; se guarda sin fin.`);b=null}
     if(b&&toN(b)-toN(a)>14){errors.push(`Línea ${i+1}: regla de más de 15 días; se guarda sin fin.`);b=null}
     const moods=(f[2]||"").split("|").map(x=>x.trim()).filter(Boolean);
+    const unk=moods.filter(x=>!moodKey(x));if(unk.length)errors.push(`Línea ${i+1}: ánimo desconocido «${esc(unk.join(", "))}», se ignora.`);
     rows.push({id:uid(),start:a,end:b,moods,note:f.slice(3).join(sep==";"?"; ":", ").trim()});
   });
-  return {rows,errors};
+  return {rows,errors,dayRows};
 }
 function toCSV(){
   const q=s=>/[;"\n]/.test(s)?'"'+s.replace(/"/g,'""')+'"':s;
   const P=sorted();
-  return "inicio;fin;animo;nota\n"+P.map(p=>[p.start,p.end||"",(p.moods||[]).join("|"),q(p.note||"")].join(";")).join("\n");
+  let out="inicio;fin;animo;nota\n"+P.map(p=>[p.start,p.end||"","",""].join(";")).join("\n");
+  const ds=Object.keys(state.days||{}).sort();
+  if(ds.length)out+="\n\nfecha;animo;nota\n"+ds.map(d=>{const v=state.days[d];return [d,v.m.map(moodLabel).join("|"),q(v.note||"")].join(";")}).join("\n");
+  return out;
 }
 function doImport(text){
-  const {rows,errors}=parseCSV(text);
-  if(state.demo){state.periods=[];state.demo=false}
+  const {rows,errors,dayRows}=parseCSV(text);
+  if(state.demo){state.periods=[];state.days={};state.demo=false}
+  if(!state.days)state.days={};
   const have=new Set(state.periods.map(p=>p.start));
-  let added=0,dup=0;
-  for(const r of rows){if(have.has(r.start)){dup++;continue}have.add(r.start);state.periods.push(r);added++}
+  let added=0,dup=0,dn=0;
+  for(const r of rows){
+    if(mergeDay(state.days,r.start,r.moods,r.note))dn++;
+    if(have.has(r.start)){dup++;continue}have.add(r.start);state.periods.push({id:r.id,start:r.start,end:r.end});added++}
+  for(const r of dayRows){if(mergeDay(state.days,r.date,r.moods,r.note))dn++}
   save();
   let html=`Importadas ${plural(added,"regla","reglas")}.`;
+  if(dn)html+=` ${plural(dn,"día con ánimo o nota","días con ánimo o nota")}.`;
   if(dup)html+=` ${plural(dup,"ya existía","ya existían")}.`;
   if(errors.length)html+=`<br>${errors.slice(0,6).join("<br>")}${errors.length>6?`<br>y ${errors.length-6} avisos más.`:""}`;
-  importMsg={cls:added?"ok":"err",html};
+  importMsg={cls:added||dn?"ok":"err",html};
   render();
 }
 
@@ -743,8 +954,6 @@ function periodForm(p,title){
     <div class="field"><label for="fEnd">Último día</label><input type="date" id="fEnd" value="${p.end||""}" ${ongoing?"disabled":""}></div>
   </div>
   <label class="check"><input type="checkbox" id="fOngoing" ${ongoing?"checked":""}> Aún no ha terminado</label>
-  <div class="field"><span class="lbl">Ánimo (opcional)</span><div class="chips" id="fMoods">${MOODS.map(x=>`<button type="button" class="chip" aria-pressed="${(p.moods||[]).includes(x)}" data-mood="${esc(x)}">${esc(x)}</button>`).join("")}</div></div>
-  <div class="field"><label for="fNote">Nota (opcional)</label><textarea id="fNote" placeholder="Cómo te has sentido, algo importante que pasara…">${esc(p.note||"")}</textarea></div>
   <div id="fErr" class="msg err" hidden></div>
   <button class="btn" type="button" id="fSave">Guardar</button>
   ${p.id?`<button class="btn danger" type="button" id="fDel">Eliminar esta regla</button>`:`<button class="btn ghost" type="button" id="fCancel">Cancelar</button>`}`;
@@ -752,7 +961,6 @@ function periodForm(p,title){
 function bindForm(root,p,isNew){
   const og=root.querySelector("#fOngoing"),fe=root.querySelector("#fEnd");
   og.addEventListener("change",()=>{fe.disabled=og.checked;if(og.checked)fe.value=""});
-  root.querySelectorAll(".chip").forEach(c=>c.addEventListener("click",()=>c.setAttribute("aria-pressed",c.getAttribute("aria-pressed")==="true"?"false":"true")));
   const err=t=>{const e=root.querySelector("#fErr");e.textContent=t;e.hidden=false};
   root.querySelector("#fSave").addEventListener("click",()=>{
     const s=root.querySelector("#fStart").value,e=og.checked?"":fe.value;
@@ -764,10 +972,8 @@ function bindForm(root,p,isNew){
     const clash=state.periods.find(q=>q.id!==p.id&&(()=>{const qa=toN(q.start),qb=q.end?toN(q.end):qa;return a<=qb&&b>=qa})());
     if(clash)return err(`Se solapa con la regla del ${fmtY(toN(clash.start))}.`);
     if(!og.checked&&!e)return err("Indica el último día o marca «Aún no ha terminado».");
-    const moods=[...root.querySelectorAll(".chip[aria-pressed=true]")].map(c=>c.dataset.mood);
-    const note=root.querySelector("#fNote").value.trim();
-    if(isNew){state.periods.push({id:uid(),start:s,end:e||null,moods,note})}
-    else{const q=state.periods.find(q=>q.id===p.id);Object.assign(q,{start:s,end:e||null,moods,note})}
+    if(isNew){state.periods.push({id:uid(),start:s,end:e||null})}
+    else{const q=state.periods.find(q=>q.id===p.id);Object.assign(q,{start:s,end:e||null})}
     save();closeSheet();calSel=null;render();toast(isNew?"Regla guardada":"Cambios guardados");
   });
   const del=root.querySelector("#fDel");
@@ -783,8 +989,29 @@ function openEdit(id){
   openSheet(periodForm(p,"Editar regla"),root=>bindForm(root,p,false));
 }
 function openNew(start,end){
-  const p={start:start||toS(todayN()),end:end||null,moods:[],note:""};
+  const p={start:start||toS(todayN()),end:end||null};
   openSheet(periodForm(p,"Nueva regla"),root=>bindForm(root,p,true));
+}
+function openDay(m,n){
+  const date=toS(n);const d=getDay(date);const future=n>todayN();
+  const ph=phaseOfDay(m,n);const PHn=ph?PHASES[ph.k]:null;
+  const per=m&&m.P.find(p=>n>=p.s&&n<=(p.e!=null?p.e:(p===m.last?Math.max(m.lastEnd,m.active?m.today:m.lastEnd):p.s+4)));
+  const title=dowName(n).replace(/^./,c=>c.toUpperCase())+" "+fmtLong(n)+(D(n).getUTCFullYear()!==D(todayN()).getUTCFullYear()?" de "+D(n).getUTCFullYear():"");
+  openSheet(`<h3 id="sheetTitle">${title}</h3>
+    ${PHn?`<span class="pill" style="justify-self:start;--k:${PHn.k}"><i></i>${PHn.name}${ph.k!=="retraso"?` · día ${ph.dc} del ciclo`:""}${n>todayN()?" (previsto)":""}</span>`:""}
+    ${future?`<p class="muted" style="margin:0">Podrás anotar el ánimo de este día cuando llegue.</p>`:`${moodPicker(d.m)}
+    <div class="field"><label for="dNote">Nota (opcional)</label><textarea id="dNote" placeholder="Cómo te has sentido, algo importante que pasara…">${esc(d.note)}</textarea></div>
+    <button class="btn" type="button" id="dSave">Guardar</button>`}
+    ${per?`<button class="btn ghost" type="button" id="dPer">Editar regla</button>`:(future?"":`<button class="btn ghost" type="button" id="dStart">Empezó la regla este día</button>`)}`,root=>{
+    root.querySelectorAll("[data-mk]").forEach(c=>c.addEventListener("click",()=>c.setAttribute("aria-pressed",c.getAttribute("aria-pressed")==="true"?"false":"true")));
+    const sv=root.querySelector("#dSave");
+    if(sv)sv.addEventListener("click",()=>{
+      const sel=[...root.querySelectorAll('[data-mk][aria-pressed="true"]')].map(c=>c.dataset.mk);
+      setDay(date,sel,root.querySelector("#dNote").value.trim());closeSheet();render();toast("Día guardado");
+    });
+    const ep=root.querySelector("#dPer");if(ep)ep.addEventListener("click",()=>{closeSheet();setTimeout(()=>openEdit(per.id),230)});
+    const st=root.querySelector("#dStart");if(st)st.addEventListener("click",()=>{closeSheet();calSel={a:n,b:null};render()});
+  });
 }
 function openEndOther(m){
   openSheet(`<h3 id="sheetTitle">¿Qué día terminó?</h3>
@@ -800,10 +1027,10 @@ function openEndOther(m){
 }
 function openClear(fromBanner){
   openSheet(`<h3 id="sheetTitle">${fromBanner?"Empezar con tus datos":"Borrar todos los datos"}</h3>
-  <p class="muted" style="margin:0">${fromBanner?"Se quitarán los datos de ejemplo. Después podrás importar tu CSV o añadir reglas desde el calendario.":"Se borrarán todas las reglas, notas y ánimos guardados en este navegador. No se puede deshacer; exporta una copia antes si la quieres."}</p>
+  <p class="muted" style="margin:0">${fromBanner?"Se quitarán los datos de ejemplo. Después podrás importar tu CSV o añadir reglas desde el calendario.":"Se borrarán todas las reglas y el ánimo y las notas de cada día guardados en este navegador. No se puede deshacer; exporta una copia antes si la quieres."}</p>
   <button class="btn" type="button" id="cYes">${fromBanner?"Quitar el ejemplo":"Sí, borrar todo"}</button>
   <button class="btn ghost" type="button" id="cNo">Cancelar</button>`,root=>{
-    root.querySelector("#cYes").addEventListener("click",()=>{state={periods:[],settings:state.settings,demo:false};save();closeSheet();tab=fromBanner?"datos":"hoy";render();toast(fromBanner?"Listo, añade tus reglas":"Datos borrados")});
+    root.querySelector("#cYes").addEventListener("click",()=>{state={periods:[],days:{},settings:state.settings,demo:false};save();closeSheet();tab=fromBanner?"datos":"hoy";render();toast(fromBanner?"Listo, añade tus reglas":"Datos borrados")});
     root.querySelector("#cNo").addEventListener("click",closeSheet);
   });
 }
@@ -820,6 +1047,14 @@ function toast(msg,act,fn){
 function bind(m){
   const v=$("view");
   const cf=v.querySelector("#csvFile");if(cf)cf.addEventListener("change",()=>{const n=$("csvName");if(n)n.textContent=cf.files[0]?cf.files[0].name:"Ningún archivo elegido"});
+  const tm=v.querySelector("#todayMood");
+  if(tm){
+    const date=tm.dataset.date,ta=tm.querySelector("#todayNote"),sv=tm.querySelector("#todaySaved");
+    const commit=()=>{const sel=[...tm.querySelectorAll('[data-mk][aria-pressed="true"]')].map(c=>c.dataset.mk);setDay(date,sel,ta.value.trim());sv.textContent="Guardado. Puedes cambiarlo durante todo el día."};
+    tm.querySelectorAll("[data-mk]").forEach(c=>c.addEventListener("click",()=>{c.setAttribute("aria-pressed",c.getAttribute("aria-pressed")==="true"?"false":"true");commit()}));
+    let tmr=null;ta.addEventListener("input",()=>{clearTimeout(tmr);sv.textContent="Escribiendo…";tmr=setTimeout(commit,600)});
+    ta.addEventListener("blur",()=>{clearTimeout(tmr);commit()});
+  }
   v.querySelectorAll("[data-goto]").forEach(b=>b.addEventListener("click",()=>{tab=b.dataset.goto;render()}));
   v.querySelectorAll("[data-edit]").forEach(b=>b.addEventListener("click",()=>openEdit(b.dataset.edit)));
   v.querySelectorAll("[data-luteal]").forEach(b=>b.addEventListener("click",()=>{state.settings.luteal=+b.dataset.luteal;save();render()}));
@@ -850,14 +1085,12 @@ function bind(m){
     if(suppressClick)return;
     const n=+b.dataset.day;
     if(calSel){
-      if(calSel.b==null&&n!==calSel.a){calSel.b=n;if(calSel.b<calSel.a){const t=calSel.a;calSel.a=calSel.b;calSel.b=t}}
+      if(calSel.a==null){if(n>todayN()){toast("La regla no puede empezar en el futuro");return}calSel={a:n,b:null}}
+      else if(calSel.b==null&&n!==calSel.a){calSel.b=n;if(calSel.b<calSel.a){const t=calSel.a;calSel.a=calSel.b;calSel.b=t}}
       else calSel={a:n,b:null};
       render();return;
     }
-    const p=m&&m.P.find(p=>n>=p.s&&n<=(p.e!=null?p.e:(p===m.last?Math.max(m.lastEnd,m.active?m.today:m.lastEnd):p.s+4)));
-    if(p){openEdit(p.id);return}
-    if(n>todayN()){toast("No se pueden añadir reglas futuras");return}
-    calSel={a:n,b:null};render();
+    openDay(m,n);
   }));
   v.querySelectorAll("[data-act]").forEach(b=>b.addEventListener("click",()=>{
     const a=b.dataset.act;
@@ -865,18 +1098,18 @@ function bind(m){
       const t=toS(todayN());
       if(state.periods.some(p=>p.start===t)){toast("Ya hay una regla que empieza hoy");return}
       if(m&&m.active){toast("Ya hay una regla en curso");return}
-      const np={id:uid(),start:t,end:null,moods:[],note:""};
+      const np={id:uid(),start:t,end:null};
       if(m&&m.last.e==null){const q=state.periods.find(q=>q.id===m.last.id);if(q)q.end=toS(m.lastEnd)}
       state.periods.push(np);save();render();
-      toast("Regla registrada: hoy es el día 1","Añadir ánimo",()=>openEdit(np.id));
+      toast("Regla registrada: hoy es el día 1");
     }
     else if(a==="startOther")openNew(toS(todayN()-1),null);
     else if(a==="endToday"){const q=state.periods.find(q=>q.id===m.last.id);q.end=toS(todayN());save();render();toast("Fin de regla guardado","Deshacer",()=>{q.end=null;save();render()})}
     else if(a==="endOther")openEndOther(m);
-    else if(a==="calAdd"){calSel={a:todayN(),b:null};const d=D(todayN());calMonth=Math.round(Date.UTC(d.getUTCFullYear(),d.getUTCMonth(),1)/DAY);render()}
+    else if(a==="calAdd"){calSel={a:null,b:null};render()}
     else if(a==="calToday"){calMonth=null;render()}
     else if(a==="calCancel"){calSel=null;render()}
-    else if(a==="calNext"){const s=calSel.a,e=calSel.b;openNew(toS(s),e!=null?toS(e):null)}
+    else if(a==="calNext"){if(calSel.a==null){toast("Toca primero el primer día de la regla");return}const s=calSel.a,e=calSel.b;openNew(toS(s),e!=null?toS(e):null)}
     else if(a==="import"){
       const f=$("csvFile").files[0];const txt=$("csvText").value;
       if(f){const r=new FileReader();r.onload=()=>doImport(String(r.result));r.onerror=()=>{importMsg={cls:"err",html:"No se pudo leer el archivo."};render()};r.readAsText(f)}
@@ -886,7 +1119,7 @@ function bind(m){
     else if(a==="exportShow"){$("exportBox").hidden=false;$("exportText").value=toCSV()}
     else if(a==="copy"){const ta=$("exportText");const done=()=>toast("CSV copiado");try{navigator.clipboard.writeText(ta.value).then(done,()=>{ta.select();$("exportNote").textContent="Texto seleccionado: cópialo con el menú del móvil."})}catch(e){ta.select();$("exportNote").textContent="Texto seleccionado: cópialo con el menú del móvil."}}
     else if(a==="download"){try{const blob=new Blob(["﻿"+toCSV()],{type:"text/csv"});const u=URL.createObjectURL(blob);const l=document.createElement("a");l.href=u;l.download="luna-reglas-"+toS(todayN())+".csv";document.body.appendChild(l);l.click();l.remove();setTimeout(()=>URL.revokeObjectURL(u),2000);$("exportNote").textContent="Si no se descarga nada, usa «Copiar» y pégalo en una nota o un correo."}catch(e){$("exportNote").textContent="Este navegador no permite descargar aquí. Usa «Copiar»."}}
-    else if(a==="loadDemo"){state={periods:demoData(),settings:state.settings,demo:true};save();tab="hoy";render()}
+    else if(a==="loadDemo"){const dd=demoData();state={periods:dd.periods,days:dd.days,settings:state.settings,demo:true};save();tab="hoy";render()}
     else if(a==="clearAll")openClear(false);
     else if(a==="pickMonth")openPicker(m);
     else if(a==="pickFile")$("csvFile").click();
